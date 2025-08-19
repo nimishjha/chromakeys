@@ -801,7 +801,7 @@ function hexToHslWithFallback(hex)
 	if isValidHex(hex) then
 		return hexToHsl(hex)
 	end
-	log(hex .. " is not a valid hex color")
+	forceLog(string.format("%s is not a valid hex color", hex))
 	return makeHsl(66, 66, 66)
 end
 
