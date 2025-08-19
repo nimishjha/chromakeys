@@ -1,6 +1,6 @@
 # ChromaKeys
 
-## Create color schemes within Micro using only the keyboard
+## Create color schemes within [Micro](https://github.com/zyedidia/micro) using only the keyboard
 
 You can adjust individual scopes:
 
