@@ -10,6 +10,12 @@ Or you can generate entire color schemes using a variety of palettes:
 
 ![Generate entire palettes with one keystroke](images/palettes.gif)
 
+## Installation
+
+Clone this repository into `~/.config/micro/plug`.
+
+## Usage
+
 You'll need to bind the following commands to keyboard shortcuts of your choice.
 
 ```
