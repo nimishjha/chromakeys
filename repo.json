@@ -1,0 +1,14 @@
+[
+	{
+		"Name": "chromakeys",
+		"Description": "Create color schemes within Micro using only the keyboard",
+		"Tags": ["colorschemes"],
+        "Website": "www.nimishjha.com",
+		"Versions": [
+			{
+				"Version": "0.0.1",
+				"Url": "",
+			},
+		]
+	}
+]
