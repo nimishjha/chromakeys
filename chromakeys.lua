@@ -28,7 +28,7 @@ local settings = {
 	colorFunctions = {},
 	uniformBrightness = 70,
 	minFgBrightness = 35,
-	maxFgBrightness = 90,
+	maxFgBrightness = 75,
 	maxBgBrightness = 15,
 	backgroundLightness = 6,
 	backgroundSaturation = 50,
@@ -39,7 +39,7 @@ local settings = {
 	shouldLockFgDefaultToBaseColor = false,
 	shouldRecalculateDerivedColors = true,
 	shouldAdjustPerceptualBrightness = true,
-	maxChannelValue = 240,
+	maxChannelValue = 200,
 	rulesMap = {},
 	currentScope = "fgDefault",
 	colorSchemeFolderPath = "",
@@ -54,37 +54,37 @@ local settings = {
 	lightnessStep = 0.25,
 	hueCycleStep = 10,
 	palettes = {
-		BlueOrange = { 220, 40 },
-		OrangeBlue = { 40, 45, 50, 55, 220, 240 },
+		BlueOrange         = { 220, 40 },
+		OrangeBlue         = { 40, 45, 50, 55, 220, 240 },
 		MoreBlueLessOrange = { 210, 220, 230, 240, 30, 40 },
-		BlueYellow = { 220, 240, 60 },
-		BlueRed = { 220, 230, 240, 350, 0 },
-		BlueCyan = { 220, 240, 190 },
-		BlueGreen = { 210, 220, 230, 240, 130, 140 },
-		CyanYellow = { 190, 60 },
-		CyanOrange = { 180, 190, 40 },
-		VioletBlue = { 250, 260, 220 },
-		VioletGreen = { 250, 260, 160 },
-		VioletCyan = { 250, 260, 190 },
-		VioletYellow = { 250, 260, 60 },
-		VioletOrange = { 250, 260, 30 },
-		VioletRed = { 250, 260, 0 },
-		GreenCyan = { 110, 130, 150, 170, 180, 190 },
-		GreenYellow = { 120, 130, 140, 160, 45, 55 },
-		Violet = { 250, 255, 260, 265, 270, 280 },
-		Blue = { 220, 230, 240 },
-		Cyan = { 170, 180, 190 },
-		Cyan2 = { 160, 170 },
-		Green = { 80, 90, 110, 120, 130, 140, 150, 160 },
-		Green2 = { 140, 150 },
-		Red = { 350, 0, 5 },
-		Pink = { 315, 320, 325, 330, 335 },
-		RedPink = { 0, 330 },
-		Orange = { 20, 30 },
-		Yellow = { 55, 65 },
-		CyanBlueOrange = { 180, 190, 220, 230, 240, 40 },
-		BlueRedOrange = { 230, 240, 250, 350, 0, 40 },
-		BlueCyanOrange = { 240, 210, 190, 180, 30, 40 },
+		BlueYellow         = { 220, 240, 60 },
+		BlueRed            = { 220, 230, 240, 350, 0 },
+		BlueCyan           = { 220, 240, 190 },
+		BlueGreen          = { 210, 220, 230, 240, 130, 140 },
+		CyanYellow         = { 190, 60 },
+		CyanOrange         = { 180, 190, 40 },
+		VioletBlue         = { 250, 260, 220 },
+		VioletGreen        = { 250, 260, 160 },
+		VioletCyan         = { 250, 260, 190 },
+		VioletYellow       = { 250, 260, 60 },
+		VioletOrange       = { 250, 260, 30 },
+		VioletRed          = { 250, 260, 0 },
+		GreenCyan          = { 110, 130, 150, 170, 180, 190 },
+		GreenYellow        = { 120, 130, 140, 160, 45, 55 },
+		Violet             = { 250, 255, 260, 265, 270, 280 },
+		Blue               = { 220, 230, 240 },
+		Cyan               = { 170, 180, 190 },
+		Cyan2              = { 160, 170 },
+		Green              = { 80, 90, 110, 120, 130, 140, 150, 160 },
+		Green2             = { 140, 150 },
+		Red                = { 350, 0, 5 },
+		Pink               = { 315, 320, 325, 330, 335 },
+		RedPink            = { 0, 330 },
+		Orange             = { 20, 30 },
+		Yellow             = { 55, 65 },
+		CyanBlueOrange     = { 180, 190, 220, 230, 240, 40 },
+		BlueRedOrange      = { 230, 240, 250, 350, 0, 40 },
+		BlueCyanOrange     = { 240, 210, 190, 180, 30, 40 },
 	},
 	isDebugMode = false,
 	showStatusOnLoad = false,
@@ -92,22 +92,22 @@ local settings = {
 }
 
 local ACTIONS = {
-	HUE_INCREASE = 1,
-	HUE_DECREASE = 2,
-	SATURATION_INCREASE = 3,
-	SATURATION_DECREASE = 4,
-	LIGHTNESS_INCREASE = 5,
-	LIGHTNESS_DECREASE = 6,
-	HUE_INCREASE_LARGE = 7,
-	HUE_DECREASE_LARGE = 8,
+	HUE_INCREASE              = 1,
+	HUE_DECREASE              = 2,
+	SATURATION_INCREASE       = 3,
+	SATURATION_DECREASE       = 4,
+	LIGHTNESS_INCREASE        = 5,
+	LIGHTNESS_DECREASE        = 6,
+	HUE_INCREASE_LARGE        = 7,
+	HUE_DECREASE_LARGE        = 8,
 	SATURATION_INCREASE_LARGE = 9,
 	SATURATION_DECREASE_LARGE = 10,
-	LIGHTNESS_INCREASE_LARGE = 11,
-	LIGHTNESS_DECREASE_LARGE = 12,
-	RANDOMISE = 15,
-	RANDOMISE_HUE = 16,
-	RANDOMISE_SATURATION = 17,
-	RANDOMISE_LIGHTNESS = 18,
+	LIGHTNESS_INCREASE_LARGE  = 11,
+	LIGHTNESS_DECREASE_LARGE  = 12,
+	RANDOMISE                 = 15,
+	RANDOMISE_HUE             = 16,
+	RANDOMISE_SATURATION      = 17,
+	RANDOMISE_LIGHTNESS       = 18,
 }
 
 local SPECIAL_SCOPES = {
@@ -469,7 +469,6 @@ function loadCustomColorSchemeNames()
 	showMessage("Found " .. #settings.colorSchemes .. " color schemes")
 
 	for groupName, _ in pairs(colorSchemeGroups) do
-		forceLog("pushing " .. groupName)
 		table.insert(settings.colorSchemeGroups, groupName)
 	end
 end
@@ -791,7 +790,6 @@ function hexToHsl(hex)
 
 	h = math.floor(h * 360 + 0.5)
 	s = math.floor(s * 100 + 0.5)
-	-- l = math.floor(l * 100 + 0.5)
 	l = l * 100
 
 	return makeHsl(h, s, l)
@@ -833,9 +831,9 @@ function getBaseColorName(hsl)
 	local hue = hsl.h
 	if hsl.s < 21 then return "Gray"
 	elseif (hue >= 0 and hue < 10) or (hue >= 320 and hue <= 359) then return "Red"
-	elseif hue >= 10 and hue < 50 then return "Orange"
-	elseif hue >= 50 and hue < 80 then return "Yellow"
-	elseif hue >= 80 and hue < 160 then return "Green"
+	elseif hue >= 10  and hue < 50  then return "Orange"
+	elseif hue >= 50  and hue < 80  then return "Yellow"
+	elseif hue >= 80  and hue < 160 then return "Green"
 	elseif hue >= 160 and hue < 200 then return "Cyan"
 	elseif hue >= 200 and hue < 250 then return "Blue"
 	elseif hue >= 250 and hue < 270 then return "Violet"
@@ -1049,7 +1047,6 @@ function adjustCurrentScopeColor(action)
 		[SPECIAL_SCOPES.BASE] = true,
 		[SPECIAL_SCOPES.ALL] = true,
 		[SPECIAL_SCOPES.ALL_EXCEPT_FGDEFAULT] = true,
-		-- [SPECIAL_SCOPES.ALL_EXCEPT_FGDEFAULT_AS_ONE] = true,
 	}
 
 	if scopesThatTriggerRecalculationOfDerivedColors[currentScope] then
@@ -1201,20 +1198,20 @@ function createRulesFromScheme()
 	local currentColorSchemeFile = settings.colorSchemeFolderPath .. "/" .. currentColorScheme .. ".micro"
 
 	local schemeVarsToSanitizedKeys = {
-		default = "fgDefault",
-		statement = "fgStatement",
-		constant = "fgConstant",
-		constantstring = "fgConstantString",
-		constantregex = "fgConstantRegex",
-		comment = "fgComment",
-		identifier = "fgIdentifier",
-		preproc = "fgPreproc",
-		special = "fgSpecial",
-		symbol = "fgSymbol",
-		type = "fgType",
-		statusline = "StatusLine",
-		message = "Message",
-		linenumber = "LineNumber",
+		default           = "fgDefault",
+		statement         = "fgStatement",
+		constant          = "fgConstant",
+		constantstring    = "fgConstantString",
+		constantregex     = "fgConstantRegex",
+		comment           = "fgComment",
+		identifier        = "fgIdentifier",
+		preproc           = "fgPreproc",
+		special           = "fgSpecial",
+		symbol            = "fgSymbol",
+		type              = "fgType",
+		statusline        = "StatusLine",
+		message           = "Message",
+		linenumber        = "LineNumber",
 		currentlinenumber = "CurrentLineNumber"
 	}
 
@@ -1328,15 +1325,15 @@ function applyConstraintsToRules()
 	local bg = settings.rulesMap.bgDefault
 
 	if settings.shouldRecalculateDerivedColors then
-		settings.rulesMap.fgComment = clampLightness(settings.rulesMap.fgComment, 50, 75)
-		settings.rulesMap.fgSymbol = forceLightness(fg, math.min(fg.l + 10, 75))
-		settings.rulesMap.calcBgComment = forceLightness(settings.rulesMap.fgComment, 15)
-		settings.rulesMap.calcFgStatusLine = clampSaturation(forceLightness(fg, 45), 0, 35)
-		settings.rulesMap.calcBgStatusLine = clampSaturation(forceLightness(fg, 4), 0, 35)
-		settings.rulesMap.calcBgStatusLine.l = math.min(settings.rulesMap.calcBgStatusLine.l, bg.l)
-		settings.rulesMap.calcFgLineNumber = clampSaturation(forceLightness(fg, 40), 0, 35)
+		settings.rulesMap.fgComment               = clampLightness(settings.rulesMap.fgComment, 50, 75)
+		settings.rulesMap.fgSymbol                = forceLightness(fg, math.min(fg.l + 10, 75))
+		settings.rulesMap.calcBgComment           = forceLightness(settings.rulesMap.fgComment, 15)
+		settings.rulesMap.calcFgStatusLine        = clampSaturation(forceLightness(fg, 45), 0, 35)
+		settings.rulesMap.calcBgStatusLine        = clampSaturation(forceLightness(fg, 4), 0, 35)
+		settings.rulesMap.calcBgStatusLine.l      = math.min(settings.rulesMap.calcBgStatusLine.l, bg.l)
+		settings.rulesMap.calcFgLineNumber        = clampSaturation(forceLightness(fg, 40), 0, 35)
 		settings.rulesMap.calcFgCurrentLineNumber = clampSaturation(forceLightness(fg, 65), 0, 35)
-		settings.rulesMap.calcFgMessage = clampSaturation(forceLightness(fg, 45), 0, 35)
+		settings.rulesMap.calcFgMessage           = clampSaturation(forceLightness(fg, 45), 0, 35)
 	end
 
 	if settings.shouldForceUniformBrightness then
@@ -1634,18 +1631,18 @@ function initColorFuncCycler()
 	for paletteName, paletteHues in pairs(settings.palettes) do
 		settings.colorFunctions:add({ paletteName, generateColorsByPalette(paletteName) })
 	end
-	settings.colorFunctions:add({ "RandomSaturation", generateColorsByRandomSaturation })
-	settings.colorFunctions:add({ "RandomLightness", generateColorsByRandomLightness })
-	settings.colorFunctions:add({ "RandomHueAndLightness", generateColorsByRandomHueAndLightness })
-	settings.colorFunctions:add({ "RandomHue", generateColorsByRandomHue })
+	settings.colorFunctions:add({ "RandomSaturation",       generateColorsByRandomSaturation       })
+	settings.colorFunctions:add({ "RandomLightness",        generateColorsByRandomLightness        })
+	settings.colorFunctions:add({ "RandomHueAndLightness",  generateColorsByRandomHueAndLightness  })
+	settings.colorFunctions:add({ "RandomHue",              generateColorsByRandomHue              })
 	settings.colorFunctions:add({ "RandomHueAndSaturation", generateColorsByRandomHueAndSaturation })
-	settings.colorFunctions:add({ "AdjacentHues", generateColorsByAdjacentHues })
-	settings.colorFunctions:add({ "AdjacentHuesBaseSL", generateColorsByAdjacentHuesBaseSL })
-	settings.colorFunctions:add({ "AdjacentHuesMild", generateColorsByAdjacentHuesMild })
-	settings.colorFunctions:add({ "AdjacentHuesVivid", generateColorsByAdjacentHuesVivid })
-	settings.colorFunctions:add({ "ShadesOfCyclicHue", generateColorsByShadesOfCyclicHue })
-	settings.colorFunctions:add({ "ShadesOfBaseHue", generateColorsByShadesOfBaseHue })
-	settings.colorFunctions:add({ "ShadesOfRandomHue", generateColorsByShadesOfRandomHue })
+	settings.colorFunctions:add({ "AdjacentHues",           generateColorsByAdjacentHues           })
+	settings.colorFunctions:add({ "AdjacentHuesBaseSL",     generateColorsByAdjacentHuesBaseSL     })
+	settings.colorFunctions:add({ "AdjacentHuesMild",       generateColorsByAdjacentHuesMild       })
+	settings.colorFunctions:add({ "AdjacentHuesVivid",      generateColorsByAdjacentHuesVivid      })
+	settings.colorFunctions:add({ "ShadesOfCyclicHue",      generateColorsByShadesOfCyclicHue      })
+	settings.colorFunctions:add({ "ShadesOfBaseHue",        generateColorsByShadesOfBaseHue        })
+	settings.colorFunctions:add({ "ShadesOfRandomHue",      generateColorsByShadesOfRandomHue      })
 end
 
 function previousColorFunction()
@@ -1713,48 +1710,40 @@ function init()
 		showStatus()
 	end
 
-	config.MakeCommand("ckRefreshColorSchemeList", loadCustomColorSchemeNames, config.NoComplete)
-	config.MakeCommand("ckGenerateColorScheme", generateColorScheme, config.NoComplete)
-	config.MakeCommand("ckPreviousColorFunction", previousColorFunction, config.NoComplete)
-	config.MakeCommand("ckNextColorFunction", nextColorFunction, config.NoComplete)
-	config.MakeCommand("ckScopeNext", nextScope, config.NoComplete)
-	config.MakeCommand("ckScopePrevious", previousScope, config.NoComplete)
-
-	config.MakeCommand("ckHueInc", createAdjustmentCommand(ACTIONS.HUE_INCREASE), config.NoComplete)
-	config.MakeCommand("ckHueDec", createAdjustmentCommand(ACTIONS.HUE_DECREASE), config.NoComplete)
-	config.MakeCommand("ckSaturationInc", createAdjustmentCommand(ACTIONS.SATURATION_INCREASE), config.NoComplete)
-	config.MakeCommand("ckSaturationDec", createAdjustmentCommand(ACTIONS.SATURATION_DECREASE), config.NoComplete)
-	config.MakeCommand("ckLightnessInc", createAdjustmentCommand(ACTIONS.LIGHTNESS_INCREASE), config.NoComplete)
-	config.MakeCommand("ckLightnessDec", createAdjustmentCommand(ACTIONS.LIGHTNESS_DECREASE), config.NoComplete)
-
-	config.MakeCommand("ckHueIncLarge", createAdjustmentCommand(ACTIONS.HUE_INCREASE_LARGE), config.NoComplete)
-	config.MakeCommand("ckHueDecLarge", createAdjustmentCommand(ACTIONS.HUE_DECREASE_LARGE), config.NoComplete)
-	config.MakeCommand("ckSaturationIncLarge", createAdjustmentCommand(ACTIONS.SATURATION_INCREASE_LARGE), config.NoComplete)
-	config.MakeCommand("ckSaturationDecLarge", createAdjustmentCommand(ACTIONS.SATURATION_DECREASE_LARGE), config.NoComplete)
-	config.MakeCommand("ckLightnessIncLarge", createAdjustmentCommand(ACTIONS.LIGHTNESS_INCREASE_LARGE), config.NoComplete)
-	config.MakeCommand("ckLightnessDecLarge", createAdjustmentCommand(ACTIONS.LIGHTNESS_DECREASE_LARGE), config.NoComplete)
-
-	config.MakeCommand("ckRandomiseHue", createAdjustmentCommand(ACTIONS.RANDOMISE_HUE), config.NoComplete)
-	config.MakeCommand("ckRandomiseSaturation", createAdjustmentCommand(ACTIONS.RANDOMISE_SATURATION), config.NoComplete)
-	config.MakeCommand("ckRandomiseLightness", createAdjustmentCommand(ACTIONS.RANDOMISE_LIGHTNESS), config.NoComplete)
-	config.MakeCommand("ckRandomiseColor", createAdjustmentCommand(ACTIONS.RANDOMISE), config.NoComplete)
-
-	config.MakeCommand("ckResetBaseSaturationAndLightness", resetBaseSaturationAndLightness, config.NoComplete)
-
-	config.MakeCommand("ckSaveCurrentTheme", saveCurrentThemeToNumberedFile, config.NoComplete)
-	config.MakeCommand("ckCreateRulesFromScheme", createRulesFromScheme, config.NoComplete)
-
-	config.MakeCommand("ckToggleDebugMode", toggleDebugMode, config.NoComplete)
-	config.MakeCommand("ckToggleConstraints", toggleConstraints, config.NoComplete)
-	config.MakeCommand("ckForceLogRules", forceLogRules, config.NoComplete)
-
-	config.MakeCommand("ckFirstColorScheme", firstColorScheme, config.NoComplete)
-	config.MakeCommand("ckNextGroup", nextGroup, config.NoComplete)
-	config.MakeCommand("ckPreviousColorScheme", previousColorScheme, config.NoComplete)
-	config.MakeCommand("ckNextColorScheme", nextColorScheme, config.NoComplete)
-
-	config.MakeCommand("ckSetColorSchemeA", setColorSchemeA, config.NoComplete)
-	config.MakeCommand("ckSetColorSchemeB", setColorSchemeB, config.NoComplete)
-	config.MakeCommand("ckSelectColorSchemeA", selectColorSchemeA, config.NoComplete)
-	config.MakeCommand("ckSelectColorSchemeB", selectColorSchemeB, config.NoComplete)
+	config.MakeCommand("ckRefreshColorSchemeList",          loadCustomColorSchemeNames,                                 config.NoComplete)
+	config.MakeCommand("ckGenerateColorScheme",             generateColorScheme,                                        config.NoComplete)
+	config.MakeCommand("ckPreviousColorFunction",           previousColorFunction,                                      config.NoComplete)
+	config.MakeCommand("ckNextColorFunction",               nextColorFunction,                                          config.NoComplete)
+	config.MakeCommand("ckScopeNext",                       nextScope,                                                  config.NoComplete)
+	config.MakeCommand("ckScopePrevious",                   previousScope,                                              config.NoComplete)
+	config.MakeCommand("ckHueInc",                          createAdjustmentCommand(ACTIONS.HUE_INCREASE),              config.NoComplete)
+	config.MakeCommand("ckHueDec",                          createAdjustmentCommand(ACTIONS.HUE_DECREASE),              config.NoComplete)
+	config.MakeCommand("ckSaturationInc",                   createAdjustmentCommand(ACTIONS.SATURATION_INCREASE),       config.NoComplete)
+	config.MakeCommand("ckSaturationDec",                   createAdjustmentCommand(ACTIONS.SATURATION_DECREASE),       config.NoComplete)
+	config.MakeCommand("ckLightnessInc",                    createAdjustmentCommand(ACTIONS.LIGHTNESS_INCREASE),        config.NoComplete)
+	config.MakeCommand("ckLightnessDec",                    createAdjustmentCommand(ACTIONS.LIGHTNESS_DECREASE),        config.NoComplete)
+	config.MakeCommand("ckHueIncLarge",                     createAdjustmentCommand(ACTIONS.HUE_INCREASE_LARGE),        config.NoComplete)
+	config.MakeCommand("ckHueDecLarge",                     createAdjustmentCommand(ACTIONS.HUE_DECREASE_LARGE),        config.NoComplete)
+	config.MakeCommand("ckSaturationIncLarge",              createAdjustmentCommand(ACTIONS.SATURATION_INCREASE_LARGE), config.NoComplete)
+	config.MakeCommand("ckSaturationDecLarge",              createAdjustmentCommand(ACTIONS.SATURATION_DECREASE_LARGE), config.NoComplete)
+	config.MakeCommand("ckLightnessIncLarge",               createAdjustmentCommand(ACTIONS.LIGHTNESS_INCREASE_LARGE),  config.NoComplete)
+	config.MakeCommand("ckLightnessDecLarge",               createAdjustmentCommand(ACTIONS.LIGHTNESS_DECREASE_LARGE),  config.NoComplete)
+	config.MakeCommand("ckRandomiseHue",                    createAdjustmentCommand(ACTIONS.RANDOMISE_HUE),             config.NoComplete)
+	config.MakeCommand("ckRandomiseSaturation",             createAdjustmentCommand(ACTIONS.RANDOMISE_SATURATION),      config.NoComplete)
+	config.MakeCommand("ckRandomiseLightness",              createAdjustmentCommand(ACTIONS.RANDOMISE_LIGHTNESS),       config.NoComplete)
+	config.MakeCommand("ckRandomiseColor",                  createAdjustmentCommand(ACTIONS.RANDOMISE),                 config.NoComplete)
+	config.MakeCommand("ckResetBaseSaturationAndLightness", resetBaseSaturationAndLightness,                            config.NoComplete)
+	config.MakeCommand("ckSaveCurrentTheme",                saveCurrentThemeToNumberedFile,                             config.NoComplete)
+	config.MakeCommand("ckCreateRulesFromScheme",           createRulesFromScheme,                                      config.NoComplete)
+	config.MakeCommand("ckToggleDebugMode",                 toggleDebugMode,                                            config.NoComplete)
+	config.MakeCommand("ckToggleConstraints",               toggleConstraints,                                          config.NoComplete)
+	config.MakeCommand("ckForceLogRules",                   forceLogRules,                                              config.NoComplete)
+	config.MakeCommand("ckFirstColorScheme",                firstColorScheme,                                           config.NoComplete)
+	config.MakeCommand("ckNextGroup",                       nextGroup,                                                  config.NoComplete)
+	config.MakeCommand("ckPreviousColorScheme",             previousColorScheme,                                        config.NoComplete)
+	config.MakeCommand("ckNextColorScheme",                 nextColorScheme,                                            config.NoComplete)
+	config.MakeCommand("ckSetColorSchemeA",                 setColorSchemeA,                                            config.NoComplete)
+	config.MakeCommand("ckSetColorSchemeB",                 setColorSchemeB,                                            config.NoComplete)
+	config.MakeCommand("ckSelectColorSchemeA",              selectColorSchemeA,                                         config.NoComplete)
+	config.MakeCommand("ckSelectColorSchemeB",              selectColorSchemeB,                                         config.NoComplete)
 end
