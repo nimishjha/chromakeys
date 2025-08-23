@@ -466,7 +466,7 @@ function loadCustomColorSchemeNames()
 		end
 	end
 	settings.colorSchemes = colorSchemeNames
-	showMessage("Found " .. #settings.colorSchemes .. " color schemes")
+	-- showMessage("Found " .. #settings.colorSchemes .. " color schemes")
 
 	for groupName, _ in pairs(colorSchemeGroups) do
 		table.insert(settings.colorSchemeGroups, groupName)
@@ -1517,9 +1517,6 @@ function generateColorsByRandomHue(numColors)
 	local colors = {}
 	for _ = 1, numColors do
 		local hue = math.random(0, 359)
-		if math.abs(hue - settings.base.h) < 30 then
-			hue = addHue(hue, math.random(30, 90))
-		end
 		table.insert(colors, makeHsl(hue, settings.base.s, settings.base.l))
 	end
 
@@ -1531,9 +1528,6 @@ function generateColorsByRandomHueAndLightness(numColors)
 	local colors = {}
 	for _ = 1, numColors do
 		local hue = math.random(0, 359)
-		if math.abs(hue - settings.base.h) < 30 then
-			hue = addHue(hue, math.random(30, 90))
-		end
 		table.insert(colors, makeHsl(hue, settings.base.s, math.random(settings.minFgBrightness, settings.maxFgBrightness)))
 	end
 	return colors
@@ -1591,9 +1585,6 @@ function generateColorsByRandomHueAndSaturation(numColors)
 	local colors = {}
 	for _ = 1, numColors do
 		local hue = math.random(0, 359)
-		if math.abs(hue - settings.base.h) < 30 then
-			hue = addHue(hue, math.random(30, 90))
-		end
 		table.insert(colors, makeHsl(hue, math.random(20, 90), settings.base.l))
 	end
 	return colors
