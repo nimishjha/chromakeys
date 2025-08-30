@@ -81,10 +81,10 @@ ckRandomiseSaturation
 
 There are four special scopes:
 
-- base: This sets the base color. If you're creating a color scheme manually (as opposed to using the palettes), this is the first scope you need to set.
-- all: This applies the command to all scopes. Useful if you want to adjust the hue/saturation/lightness of the entire scheme.
-- allExceptFgDefault: This adjusts everything but the foreground scope color (and the scope colors derived from it - see below).
-- allExceptFgDefaultAsOne: Same as allExceptFgDefault, but it changes all the affected scopes in lockstep.
+- `base`: This sets the base color. If you're creating a color scheme manually (as opposed to using the palettes), this is the first scope you need to set.
+- `all`: This applies the command to all scopes. Useful if you want to adjust the hue/saturation/lightness of the entire scheme.
+- `allExceptFgDefault`: This adjusts everything but the foreground scope color (and the scope colors derived from it - see below).
+- `allExceptFgDefaultAsOne`: Same as allExceptFgDefault, but it changes all the affected scopes in lockstep.
 
 ## Derived scope colors
 
@@ -101,11 +101,11 @@ Current line number (calcFgCurrentLineNumber)
 Message (calcFgMessage)
 ```
 
-You can also change these individually, however, if you use a palette generator function, it will overwrite your changes with the new derived colors.
+You can also change these individually, but if you use a palette generator function, it will overwrite your changes with the new derived colors.
 
 ## Generate entire color schemes in one go using palettes
 
-The `ckPreviousColorFunction` (Alt-1) and `ckNextColorFunction` (Alt-2) commands select the color generator function. `ckGenerateColorScheme` (F8, or Alt-g, or Alt-3) uses the selected function to generate a color scheme. Most of these functions take their base hue and saturation from the base scope. These base settings have a large effect: the same palette function will generate strikingly different-looking color schemes based on the lightness and saturation settings of the base scope.
+The `ckPreviousColorFunction` (Alt-1) and `ckNextColorFunction` (Alt-2) commands select the color generator function. `ckGenerateColorScheme` (F8, or Alt-g, or Alt-3) uses the selected function to generate a color scheme. Most of these functions take their base hue and saturation from the base scope. These base settings have a large effect: the same palette function will generate strikingly different-looking color schemes based on the base lightness and saturation settings.
 
 ## Saving color schemes
 
@@ -126,3 +126,7 @@ ChromaKeys can only work with files in your user-specific micro colorschemes fol
 ## Why is there no support for color schemes with light backgrounds?
 
 Well, color schemes with light backgrounds are an abomination, but there's also a practical reason: there's no way I could tolerate staring at a glaring white screen long enough to be able to implement support for them.
+
+## I don't like writing ~1KB to my SSD every time I press a key
+
+`rsync` your `~/.config/micro/colorschemes` folder to a RAM drive, and symlink to it.

@@ -16,22 +16,22 @@ local settings = {
 	fgColors = {},
 	base = {
 		h = 220,
-		s = 40,
-		l = 60
+		s = 50,
+		l = 50
 	},
 	allExceptFgDefaultAsOne = {
-		h = 220,
-		s = 40,
+		h = 330,
+		s = 50,
 		l = 50
 	},
 	scopes = {},
 	colorFunctions = {},
-	uniformBrightness = 70,
+	uniformBrightness = 60,
 	minFgBrightness = 35,
 	maxFgBrightness = 75,
 	maxBgBrightness = 15,
 	backgroundLightness = 6,
-	backgroundSaturation = 50,
+	backgroundSaturation = 100,
 	commentBgLightness = 15,
 	shouldForceUniformBrightness = false,
 	shouldEnsureSeparation = false,
@@ -54,37 +54,41 @@ local settings = {
 	lightnessStep = 0.25,
 	hueCycleStep = 10,
 	palettes = {
-		BlueOrange         = { 220, 40 },
-		OrangeBlue         = { 40, 45, 50, 55, 220, 240 },
-		MoreBlueLessOrange = { 210, 220, 230, 240, 30, 40 },
-		BlueYellow         = { 220, 240, 60 },
-		BlueRed            = { 220, 230, 240, 350, 0 },
-		BlueCyan           = { 220, 240, 190 },
-		BlueGreen          = { 210, 220, 230, 240, 130, 140 },
-		CyanYellow         = { 190, 60 },
-		CyanOrange         = { 180, 190, 40 },
-		VioletBlue         = { 250, 260, 220 },
-		VioletGreen        = { 250, 260, 160 },
-		VioletCyan         = { 250, 260, 190 },
-		VioletYellow       = { 250, 260, 60 },
-		VioletOrange       = { 250, 260, 30 },
-		VioletRed          = { 250, 260, 0 },
-		GreenCyan          = { 110, 130, 150, 170, 180, 190 },
-		GreenYellow        = { 120, 130, 140, 160, 45, 55 },
-		Violet             = { 250, 255, 260, 265, 270, 280 },
-		Blue               = { 220, 230, 240 },
-		Cyan               = { 170, 180, 190 },
-		Cyan2              = { 160, 170 },
-		Green              = { 80, 90, 110, 120, 130, 140, 150, 160 },
-		Green2             = { 140, 150 },
-		Red                = { 350, 0, 5 },
-		Pink               = { 315, 320, 325, 330, 335 },
-		RedPink            = { 0, 330 },
-		Orange             = { 20, 30 },
-		Yellow             = { 55, 65 },
-		CyanBlueOrange     = { 180, 190, 220, 230, 240, 40 },
-		BlueRedOrange      = { 230, 240, 250, 350, 0, 40 },
-		BlueCyanOrange     = { 240, 210, 190, 180, 30, 40 },
+		test1               = { 40, 310 },
+		test2               = { 330, 270, 240 },
+		VioletCyanRedOrange = { 250, 190, 0, 20 },
+		BlueOrange          = { 220, 40 },
+		OrangeBlue          = { 40, 45, 50, 55, 220, 240 },
+		MoreBlueLessOrange  = { 210, 220, 230, 240, 30, 40 },
+		BlueYellow          = { 220, 240, 60 },
+		BlueRed             = { 220, 230, 240, 350, 0 },
+		BlueCyan            = { 220, 240, 190 },
+		BlueGreen           = { 210, 220, 230, 240, 130, 140 },
+		CyanYellow          = { 190, 60 },
+		CyanOrange          = { 180, 190, 40 },
+		VioletBlue          = { 250, 260, 220 },
+		VioletGreen         = { 250, 260, 160 },
+		VioletCyan          = { 250, 260, 190 },
+		VioletYellow        = { 250, 260, 60 },
+		VioletOrange        = { 250, 260, 30 },
+		VioletRed           = { 250, 260, 0 },
+		VioletPink          = { 250, 260, 330 },
+		GreenCyan           = { 110, 130, 150, 170, 180, 190 },
+		GreenYellow         = { 120, 130, 140, 160, 45, 55 },
+		Violet              = { 250, 255, 260, 265, 270, 280 },
+		Blue                = { 220, 230, 240 },
+		Cyan                = { 170, 180, 190 },
+		Cyan2               = { 160, 170 },
+		Green               = { 80, 90, 110, 120, 130, 140, 150, 160 },
+		Green2              = { 140, 150 },
+		Red                 = { 350, 0, 5 },
+		Pink                = { 315, 320, 325, 330, 335 },
+		RedPink             = { 0, 330 },
+		Orange              = { 20, 30 },
+		Yellow              = { 55, 65 },
+		CyanBlueOrange      = { 180, 190, 220, 230, 240, 40 },
+		BlueRedOrange       = { 230, 240, 250, 350, 0, 40 },
+		BlueCyanOrange      = { 240, 210, 190, 180, 30, 40 },
 	},
 	isDebugMode = false,
 	showStatusOnLoad = false,
@@ -436,11 +440,41 @@ function getTableLength(tableInstance)
 	return count
 end
 
+function exclude(list, excludeList)
+	local excludeLookup = {}
+	for _, str in ipairs(excludeList) do
+		excludeLookup[str] = true
+	end
+
+	local filteredList = {}
+	for _, str in ipairs(list) do
+		if excludeLookup[str] == nil then
+			table.insert(filteredList, str)
+		end
+	end
+
+	return filteredList
+end
+
+function concat(list1, list2)
+	local result = {}
+	for _, value in ipairs(list1) do
+		table.insert(result, value)
+	end
+	for _, value in ipairs(list2) do
+		table.insert(result, value)
+	end
+	return result
+end
+
 function setTemplateVariables()
 	local fgVars, bgVars, calcVars = getTemplateVars()
 	settings.fgVars = fgVars
 	settings.bgVars = bgVars
 	settings.calcVars = calcVars
+	settings.fgVarsExceptFgDefault = exclude(fgVars, {
+		"fgDefault"
+	})
 end
 
 
@@ -946,10 +980,17 @@ end
 
 function resetBaseSaturationAndLightness()
 	settings.base.s = 50
-	settings.base.l = 50.25
+	settings.base.l = 50
 	createDemoRules()
 	createColorSchemeText()
 	applyColorScheme()
+end
+
+function round (x)
+	local f = math.floor(x)
+	if x == f then return f
+	else return math.floor(x + 0.5)
+	end
 end
 
 function adjustHsl(hslValue, action, scope)
@@ -977,17 +1018,17 @@ function adjustHsl(hslValue, action, scope)
 	elseif action == ACTIONS.LIGHTNESS_DECREASE then
 		l = math.max(l - lightnessStep, 0)
 	elseif action == ACTIONS.HUE_INCREASE_LARGE then
-		h = math.floor(addHue(h, settings.hueCycleStep) / settings.hueCycleStep) * settings.hueCycleStep
+		h = round(addHue(h, settings.hueCycleStep) / settings.hueCycleStep) * settings.hueCycleStep
 	elseif action == ACTIONS.HUE_DECREASE_LARGE then
-		h = math.floor(addHue(h, -settings.hueCycleStep) / settings.hueCycleStep) * settings.hueCycleStep
+		h = round(addHue(h, -settings.hueCycleStep) / settings.hueCycleStep) * settings.hueCycleStep
 	elseif action == ACTIONS.SATURATION_INCREASE_LARGE then
-		s = clamp(math.floor((s + 10) / 10) * 10, 0, 100)
+		s = clamp(round((s + 5) / 5) * 5, 0, 100)
 	elseif action == ACTIONS.SATURATION_DECREASE_LARGE then
-		s = clamp(math.floor((s - 10) / 10) * 10, 0, 100)
+		s = clamp(round((s - 5) / 5) * 5, 0, 100)
 	elseif action == ACTIONS.LIGHTNESS_INCREASE_LARGE then
-		l = clamp(math.floor((l + 10) / 10) * 10, 0, 100)
+		l = clamp(round((l + 5) / 5) * 5, 0, 100)
 	elseif action == ACTIONS.LIGHTNESS_DECREASE_LARGE then
-		l = clamp(math.floor((l - 10) / 10) * 10, 0, 100)
+		l = clamp(round((l - 5) / 5) * 5, 0, 100)
 	elseif action == ACTIONS.RANDOMISE then
 		h = math.random(0, 359)
 		s = math.random(10, 90)
@@ -1032,8 +1073,20 @@ function adjustCurrentScopeColor(action)
 	elseif currentScope == SPECIAL_SCOPES.ALL_EXCEPT_FGDEFAULT_AS_ONE then
 		local currentColor = settings.allExceptFgDefaultAsOne
 		local adjustedHsl = adjustHsl(currentColor, action, currentScope)
-		for _, scope in ipairs(settings.fgVars) do
-			if scope ~= "fgDefault" then
+		if action == ACTIONS.RANDOMISE_HUE then
+			for _, scope in ipairs(settings.fgVarsExceptFgDefault) do
+				settings.rulesMap[scope].h = adjustedHsl.h
+			end
+		elseif action == ACTIONS.RANDOMISE_SATURATION then
+			for _, scope in ipairs(settings.fgVarsExceptFgDefault) do
+				settings.rulesMap[scope].s = adjustedHsl.s
+			end
+		elseif action == ACTIONS.RANDOMISE_LIGHTNESS then
+			for _, scope in ipairs(settings.fgVarsExceptFgDefault) do
+				settings.rulesMap[scope].l = adjustedHsl.l
+			end
+		else
+			for _, scope in ipairs(settings.fgVarsExceptFgDefault) do
 				setScopeColor(scope, adjustedHsl)
 			end
 		end
@@ -1326,7 +1379,10 @@ function applyConstraintsToRules()
 
 	if settings.shouldRecalculateDerivedColors then
 		settings.rulesMap.fgComment               = clampLightness(settings.rulesMap.fgComment, 50, 75)
-		settings.rulesMap.fgSymbol                = forceLightness(fg, math.min(fg.l + 10, 75))
+		-- settings.rulesMap.fgSymbol                = forceLightness(fg, math.min(fg.l + 10, 75))
+		-- settings.rulesMap.fgSymbol                = makeHsl(settings.rulesMap.fgSymbol.h, 100, 50)
+		-- settings.rulesMap.fgSymbol                = makeHsl(settings.rulesMap.fgStatement.h, 100, 50)
+		settings.rulesMap.fgSymbol                = makeHsl(fg.h, 100, 50)
 		settings.rulesMap.calcBgComment           = forceLightness(settings.rulesMap.fgComment, 15)
 		settings.rulesMap.calcFgStatusLine        = clampSaturation(forceLightness(fg, 45), 0, 35)
 		settings.rulesMap.calcBgStatusLine        = clampSaturation(forceLightness(fg, 4), 0, 35)
@@ -1379,8 +1435,8 @@ function generateColorsByPalette(paletteName)
 		local s = settings.base.s
 		local l = settings.base.l
 		local hVariance = 10
-		local sVariance = 30
-		local lVariance = 30
+		local sVariance = #hues > 2 and 10 or 50
+		local lVariance = #hues > 2 and 10 or 50
 		for _, hue in ipairs(hues) do
 			for _ = 1, colorsPerHue do
 				local hFinal = addHue(hue, math.random(0, hVariance))
@@ -1450,7 +1506,7 @@ function generateColorsByAdjacentHues(numColors)
 	local hue = math.random(0, 359)
 	local saturation = math.random(math.min(settings.base.s, 70), 90)
 	local lightness = math.random(math.min(settings.base.l, 60), 70)
-	local hueStep = math.random(5, 20)
+	local hueStep = math.random(3, 6)
 
 	for _ = 0, numColors - 1 do
 		hue = addHue(hue, hueStep)
@@ -1467,7 +1523,7 @@ function generateColorsByAdjacentHuesBaseSL(numColors)
 	local hue = math.random(0, 359)
 	local saturation = settings.base.s
 	local lightness = settings.base.l
-	local hueStep = math.random(10, 30)
+	local hueStep = math.random(3, 6)
 
 	for _ = 0, numColors - 1 do
 		hue = addHue(hue, hueStep)
@@ -1484,7 +1540,7 @@ function generateColorsByAdjacentHuesMild(numColors)
 	local hue = math.random(0, 359)
 	local saturation = 30
 	local lightness = 55
-	local hueStep = math.random(10, 30)
+	local hueStep = math.random(3, 6)
 
 	for _ = 0, numColors - 1 do
 		hue = addHue(hue, hueStep)
@@ -1501,7 +1557,7 @@ function generateColorsByAdjacentHuesVivid(numColors)
 	local hue = math.random(0, 359)
 	local saturation = 60
 	local lightness = 50
-	local hueStep = math.random(5, 20)
+	local hueStep = math.random(3, 6)
 
 	for _ = 0, numColors - 1 do
 		hue = addHue(hue, hueStep)
@@ -1546,8 +1602,22 @@ function generateColorsByRandomLightness(numColors)
 	if numColors < 1 then return {} end
 	local colors = {}
 	for _ = 1, numColors do
-		table.insert(colors, makeHsl(settings.base.h, settings.base.s, math.random(20, settings.maxFgBrightness)))
+		table.insert(colors, makeHsl(settings.base.h, settings.base.s, math.random(20, 65)))
 	end
+	return colors
+end
+
+function generateColorsBySteppedLightness(numColors)
+	if numColors < 1 then return {} end
+	local colors = {}
+	local lightnessRange = 65 - settings.minFgBrightness
+	local step = lightnessRange / numColors
+	local lightness = settings.minFgBrightness
+	for _ = 1, numColors do
+		table.insert(colors, makeHsl(settings.base.h, settings.base.s, lightness))
+		lightness = lightness + step
+	end
+	shuffle(colors)
 	return colors
 end
 
@@ -1555,7 +1625,8 @@ function generateColorsByShadesOfBaseHue(numColors)
 	if numColors < 1 then return {} end
 	local colors = {}
 	for _ = 1, numColors do
-		table.insert(colors, makeHsl(settings.base.h, math.random(20, 90), math.random(20, 90)))
+		-- table.insert(colors, makeHsl(settings.base.h, math.random(20, 90), math.random(20, 60)))
+		table.insert(colors, makeHsl(settings.base.h, settings.base.s, math.random(20, 60)))
 	end
 	return colors
 end
@@ -1580,13 +1651,18 @@ function generateColorsByShadesOfCyclicHue(numColors)
 	return colors
 end
 
-function generateColorsByRandomHueAndSaturation(numColors)
+function generateColorsByRandomPalette(numColors)
 	if numColors < 1 then return {} end
 	local colors = {}
-	for _ = 1, numColors do
-		local hue = math.random(0, 359)
-		table.insert(colors, makeHsl(hue, math.random(20, 90), settings.base.l))
+	local hue = math.random(0, 359)
+	for i = 1, numColors do
+		table.insert(colors, makeHsl(hue, math.random(20, 90), math.random(35, 65)))
+		-- if i == math.floor(numColors / 2) or i == math.floor(numColors / 3) then
+		if i == math.floor(numColors / 2) then
+			hue = math.random(0, 359)
+		end
 	end
+	shuffle(colors)
 	return colors
 end
 
@@ -1623,10 +1699,8 @@ function initColorFuncCycler()
 		settings.colorFunctions:add({ paletteName, generateColorsByPalette(paletteName) })
 	end
 	settings.colorFunctions:add({ "RandomSaturation",       generateColorsByRandomSaturation       })
-	settings.colorFunctions:add({ "RandomLightness",        generateColorsByRandomLightness        })
 	settings.colorFunctions:add({ "RandomHueAndLightness",  generateColorsByRandomHueAndLightness  })
 	settings.colorFunctions:add({ "RandomHue",              generateColorsByRandomHue              })
-	settings.colorFunctions:add({ "RandomHueAndSaturation", generateColorsByRandomHueAndSaturation })
 	settings.colorFunctions:add({ "AdjacentHues",           generateColorsByAdjacentHues           })
 	settings.colorFunctions:add({ "AdjacentHuesBaseSL",     generateColorsByAdjacentHuesBaseSL     })
 	settings.colorFunctions:add({ "AdjacentHuesMild",       generateColorsByAdjacentHuesMild       })
@@ -1634,6 +1708,10 @@ function initColorFuncCycler()
 	settings.colorFunctions:add({ "ShadesOfCyclicHue",      generateColorsByShadesOfCyclicHue      })
 	settings.colorFunctions:add({ "ShadesOfBaseHue",        generateColorsByShadesOfBaseHue        })
 	settings.colorFunctions:add({ "ShadesOfRandomHue",      generateColorsByShadesOfRandomHue      })
+	settings.colorFunctions:add({ "RandomLightness",        generateColorsByRandomLightness        })
+	settings.colorFunctions:add({ "SteppedLightness",       generateColorsBySteppedLightness       })
+	settings.colorFunctions:add({ "RandomPalette",          generateColorsByRandomPalette          })
+
 end
 
 function previousColorFunction()
