@@ -6,6 +6,7 @@ local buffer = import("micro/buffer")
 local os = import("os")
 local ioutil = import("ioutil")
 local fmt = import("fmt")
+local time = import("time")
 
 local settings = {
 	colorSchemes = {},
@@ -863,7 +864,7 @@ end
 
 function getBaseColorName(hsl)
 	local hue = hsl.h
-	if hsl.s < 21 then return "Gray"
+	if hsl.s < 15 then return "Gray"
 	elseif (hue >= 0 and hue < 10) or (hue >= 320 and hue <= 359) then return "Red"
 	elseif hue >= 10  and hue < 50  then return "Orange"
 	elseif hue >= 50  and hue < 80  then return "Yellow"
@@ -1126,7 +1127,7 @@ function setScopeColor(scope, hsl)
 	settings.rulesMap[scope] = hsl
 	if scope == "fgDefault" then
 		deriveBgDefaultFromFgDefault()
-		settings.base.h = settings.rulesMap.fgDefault.h
+		-- settings.base.h = settings.rulesMap.fgDefault.h
 	elseif scope == "fgComment" then
 		deriveBgCommentFromFgComment()
 	elseif scope == "bgDefault" or scope == SPECIAL_SCOPES.ALL or scope == SPECIAL_SCOPES.ALL_EXCEPT_FGDEFAULT or scope == SPECIAL_SCOPES.ALL_EXCEPT_FGDEFAULT_AS_ONE then
@@ -1390,6 +1391,8 @@ function applyConstraintsToRules()
 		settings.rulesMap.calcFgLineNumber        = clampSaturation(forceLightness(fg, 40), 0, 35)
 		settings.rulesMap.calcFgCurrentLineNumber = clampSaturation(forceLightness(fg, 65), 0, 35)
 		settings.rulesMap.calcFgMessage           = clampSaturation(forceLightness(fg, 45), 0, 35)
+
+		settings.rulesMap.fgConstantString.h = settings.rulesMap.fgConstant.h
 	end
 
 	if settings.shouldForceUniformBrightness then
@@ -1657,12 +1660,74 @@ function generateColorsByRandomPalette(numColors)
 	local hue = math.random(0, 359)
 	for i = 1, numColors do
 		table.insert(colors, makeHsl(hue, math.random(20, 90), math.random(35, 65)))
-		-- if i == math.floor(numColors / 2) or i == math.floor(numColors / 3) then
 		if i == math.floor(numColors / 2) then
 			hue = math.random(0, 359)
 		end
 	end
 	shuffle(colors)
+	return colors
+end
+
+function generateColorsBySemiRandomPalette(numColors)
+	if numColors < 1 then return {} end
+	local colors = {}
+	local hue = settings.base.h
+	for i = 1, numColors do
+		table.insert(colors, makeHsl(hue, math.random(20, 90), math.random(35, 65)))
+		if i == math.floor(numColors / 2) then
+			hue = math.random(0, 359)
+		end
+	end
+	shuffle(colors)
+	return colors
+end
+
+function generateColorsBySemiRandomFixedBaseH(numColors)
+	if numColors < 1 then return {} end
+	local colors = {}
+	local hue = settings.base.h
+	for i = 1, numColors do
+		table.insert(colors, makeHsl(hue, math.random(20, 90), math.random(35, 65)))
+		if i == math.floor(numColors / 2) then
+			hue = math.random(0, 359)
+		end
+	end
+	local firstColor = colors[1]
+	shuffle(colors)
+	colors[1] = firstColor
+	return colors
+end
+
+function generateColorsBySemiRandomFixedBaseHS(numColors)
+	if numColors < 1 then return {} end
+	local colors = {}
+	local hue = settings.base.h
+	for i = 1, numColors do
+		table.insert(colors, makeHsl(hue, math.random(20, 90), math.random(35, 65)))
+		if i == math.floor(numColors / 2) then
+			hue = math.random(0, 359)
+		end
+	end
+	local firstColor = colors[1]
+	shuffle(colors)
+	colors[1] = firstColor
+	colors[1].s = settings.base.s
+	return colors
+end
+
+function generateColorsBySemiRandomFixedBaseHSL(numColors)
+	if numColors < 1 then return {} end
+	local colors = {}
+	local hue = settings.base.h
+	for i = 1, numColors do
+		table.insert(colors, makeHsl(hue, math.random(20, 90), math.random(35, 65)))
+		if i == math.floor(numColors / 2) then
+			hue = math.random(0, 359)
+		end
+	end
+	local firstColor = colors[1]
+	shuffle(colors)
+	colors[1] = settings.base
 	return colors
 end
 
@@ -1711,7 +1776,12 @@ function initColorFuncCycler()
 	settings.colorFunctions:add({ "RandomLightness",        generateColorsByRandomLightness        })
 	settings.colorFunctions:add({ "SteppedLightness",       generateColorsBySteppedLightness       })
 	settings.colorFunctions:add({ "RandomPalette",          generateColorsByRandomPalette          })
+	settings.colorFunctions:add({ "SemiRandomPalette",      generateColorsBySemiRandomPalette      })
 
+	settings.colorFunctions:add({ "SemiRandomFixedBaseH",    generateColorsBySemiRandomFixedBaseH    })
+	settings.colorFunctions:add({ "SemiRandomFixedBaseHS",   generateColorsBySemiRandomFixedBaseHS   })
+
+	settings.colorFunctions:addAndSelect({ "SemiRandomFixedBaseHSL",   generateColorsBySemiRandomFixedBaseHSL   })
 end
 
 function previousColorFunction()
@@ -1766,6 +1836,7 @@ function createScratchFilesIfRequired()
 end
 
 function init()
+	math.randomseed(time.Now():Unix())
 	settings.colorSchemeFolderPath = os.UserHomeDir() .. "/.config/micro/colorschemes"
 	loadCustomColorSchemeNames()
 	setTemplateVariables()
