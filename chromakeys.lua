@@ -1132,6 +1132,15 @@ function setScopeColor(scope, hsl)
 		deriveBgCommentFromFgComment()
 	elseif scope == "bgDefault" or scope == SPECIAL_SCOPES.ALL or scope == SPECIAL_SCOPES.ALL_EXCEPT_FGDEFAULT or scope == SPECIAL_SCOPES.ALL_EXCEPT_FGDEFAULT_AS_ONE then
 		setBackgroundColor(settings.rulesMap.bgDefault)
+	elseif scope == "calcFgMessage" then
+		settings.rulesMap.calcFgLineNumber.h = settings.rulesMap.calcFgMessage.h
+		settings.rulesMap.calcFgStatusLine.h = settings.rulesMap.calcFgMessage.h
+	elseif scope == "calcFgLineNumber" then
+		settings.rulesMap.calcFgMessage.h = settings.rulesMap.calcFgLineNumber.h
+		settings.rulesMap.calcFgStatusLine.h = settings.rulesMap.calcFgLineNumber.h
+	elseif scope == "calcFgStatusLine" then
+		settings.rulesMap.calcFgLineNumber.h = settings.rulesMap.calcFgStatusLine.h
+		settings.rulesMap.calcFgMessage.h = settings.rulesMap.calcFgStatusLine.h
 	end
 end
 
@@ -1385,12 +1394,12 @@ function applyConstraintsToRules()
 		-- settings.rulesMap.fgSymbol                = makeHsl(settings.rulesMap.fgStatement.h, 100, 50)
 		settings.rulesMap.fgSymbol                = makeHsl(fg.h, 100, 50)
 		settings.rulesMap.calcBgComment           = forceLightness(settings.rulesMap.fgComment, 15)
-		settings.rulesMap.calcFgStatusLine        = clampSaturation(forceLightness(fg, 45), 0, 35)
+		settings.rulesMap.calcFgStatusLine        = clampSaturation(forceLightness(fg, 35), 0, 35)
 		settings.rulesMap.calcBgStatusLine        = clampSaturation(forceLightness(fg, 4), 0, 35)
 		settings.rulesMap.calcBgStatusLine.l      = math.min(settings.rulesMap.calcBgStatusLine.l, bg.l)
-		settings.rulesMap.calcFgLineNumber        = clampSaturation(forceLightness(fg, 40), 0, 35)
-		settings.rulesMap.calcFgCurrentLineNumber = clampSaturation(forceLightness(fg, 65), 0, 35)
-		settings.rulesMap.calcFgMessage           = clampSaturation(forceLightness(fg, 45), 0, 35)
+		settings.rulesMap.calcFgLineNumber        = clampSaturation(forceLightness(fg, 25), 0, 40)
+		settings.rulesMap.calcFgCurrentLineNumber = clampSaturation(forceLightness(fg, 65), 0, 40)
+		settings.rulesMap.calcFgMessage           = clampSaturation(forceLightness(fg, 35), 0, 35)
 
 		settings.rulesMap.fgConstantString.h = settings.rulesMap.fgConstant.h
 	end
