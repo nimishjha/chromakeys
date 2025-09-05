@@ -101,11 +101,15 @@ Current line number (calcFgCurrentLineNumber)
 Message (calcFgMessage)
 ```
 
-You can also change these individually, but if you use a palette generator function, it will overwrite your changes with the new derived colors.
+You can also change these individually, but if you then use a palette generator function, it will overwrite your changes with the new derived colors.
 
 ## Generate entire color schemes in one go using palettes
 
 The `ckPreviousColorFunction` (Alt-1) and `ckNextColorFunction` (Alt-2) commands select the color generator function. `ckGenerateColorScheme` (F8, or Alt-g, or Alt-3) uses the selected function to generate a color scheme. Most of these functions take their base hue and saturation from the base scope. These base settings have a large effect: the same palette function will generate strikingly different-looking color schemes based on the base lightness and saturation settings.
+
+The plugin comes with a range of pre-selected palettes. Or if you prefer to make your own, use the `RandomPalette` function to generate color schemes until you find a palette you like, then switch to the `Custom` function (It's right next to the `RandomPalette` function, so if you're using the default bindings you just need to press `Alt-2`.). You can then generate color schemes using that palette.
+
+If you prefer to set the custom palette hues manually, or if you want more than two base hues, you can use the command `ckCustomPaletteSetHues <hue1> <hue2> ... <hueN>`.
 
 ## Saving color schemes
 
