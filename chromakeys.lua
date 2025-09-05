@@ -1518,9 +1518,9 @@ function applyConstraintsToRules()
 		return false
 	end
 
+	-- settings.rulesMap.fgDefault.l = getDimmestColor(settings.fgColors).l
 	ensureFgBgLightness()
 
-	-- setScopeColor("fgDefault", getDimmestColor(settings.fgColors))
 	local fg = settings.rulesMap.fgDefault
 	local bg = settings.rulesMap.bgDefault
 
@@ -1674,7 +1674,7 @@ function generateColorsByRandomLightness(numColors)
 	if numColors < 1 then return {} end
 	local colors = {}
 	for _ = 1, numColors do
-		table.insert(colors, makeHsl(settings.base.h, settings.base.s, math.random(20, 65)))
+		table.insert(colors, makeHsl(settings.base.h, settings.base.s, math.random(settings.minFgLightness, 65)))
 	end
 	return colors
 end
