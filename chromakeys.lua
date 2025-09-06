@@ -1374,16 +1374,16 @@ function createDemoRules()
 	local fgColor = settings.base
 	local bgColor = dimForBackground(fgColor)
 	for _, varName in ipairs(settings.fgVars) do
-		setScopeColor(varName, fgColor)
+		settings.rulesMap[varName] = fgColor
 	end
 	for _, varName in ipairs(settings.bgVars) do
-		setScopeColor(varName, bgColor)
+		settings.rulesMap[varName] = bgColor
 	end
 	for _, varName in ipairs(settings.calcVars) do
-		setScopeColor(varName, fgColor)
+		settings.rulesMap[varName] = fgColor
 	end
 	for _, varName in ipairs(SPECIAL_SCOPES) do
-		setScopeColor(varName, fgColor)
+		settings.rulesMap[varName] = fgColor
 	end
 	applyConstraintsToRules()
 end
