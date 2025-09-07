@@ -91,6 +91,7 @@ local settings = {
 		RedPink               = { 0, 330 },
 		Violet                = { 250, 255, 260, 265, 270, 280 },
 		VioletBlue            = { 250, 260, 220 },
+		VioletGreenCyan       = { 250, 90, 190 },
 		VioletCyan            = { 250, 260, 190 },
 		VioletCyanRedOrange   = { 250, 190, 0, 20 },
 		VioletGreen           = { 250, 260, 160 },
@@ -1644,18 +1645,15 @@ function createPaletteFunction(paletteName)
 end
 
 function generateColorsByRandomPalette(numColors)
-	if numColors < 1 then return {} end
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { math.random(0, 359), math.random(0, 359) }
 	return generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 end
 
-function generateColorsByCustomPalette(numColors)
-	if numColors < 1 then return {} end
+function generateColorsByCustomHues(numColors)
 	return generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 end
 
 function generateColorsBySemiRandomPalette(numColors)
-	if numColors < 1 then return {} end
 	if math.random() > 0.5 then
 		settings.palettes[settings.CUSTOM_PALETTE_NAME] = { settings.base.h, math.random(0, 359) }
 	else
@@ -1665,13 +1663,11 @@ function generateColorsBySemiRandomPalette(numColors)
 end
 
 function generateColorsBySemiRandomFixedBaseH(numColors)
-	if numColors < 1 then return {} end
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { settings.base.h, math.random(0, 359) }
 	return generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 end
 
 function generateColorsBySemiRandomFixedBaseHS(numColors)
-	if numColors < 1 then return {} end
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { settings.base.h, math.random(0, 359) }
 	local colors = generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 	colors[1].h = settings.base.h
@@ -1680,7 +1676,6 @@ function generateColorsBySemiRandomFixedBaseHS(numColors)
 end
 
 function generateColorsBySemiRandomFixedBaseHSL(numColors)
-	if numColors < 1 then return {} end
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { settings.base.h, math.random(0, 359) }
 	local colors = generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 	colors[1] = settings.base
@@ -1688,8 +1683,6 @@ function generateColorsBySemiRandomFixedBaseHSL(numColors)
 end
 
 function generateColorsByAdjacentHues(numColors)
-	if numColors < 1 then return {} end
-
 	local hue = settings.base.h
 	local hueStep = math.random(3, 6)
 	local hues = {}
@@ -1703,8 +1696,6 @@ function generateColorsByAdjacentHues(numColors)
 end
 
 function generateColorsByRandomHueForEveryColor(numColors)
-	if numColors < 1 then return {} end
-
 	local hues = {}
 	for _ = 1, numColors do
 		local hue = math.random(0, 359)
@@ -1715,7 +1706,6 @@ function generateColorsByRandomHueForEveryColor(numColors)
 end
 
 function generateColorsByRandomLightness(numColors)
-	if numColors < 1 then return {} end
 	local colors = {}
 	for _ = 1, numColors do
 		table.insert(colors, makeHsl(settings.base.h, settings.base.s, math.random(settings.minFgLightness, 60)))
@@ -1724,7 +1714,6 @@ function generateColorsByRandomLightness(numColors)
 end
 
 function generateColorsBySteppedLightness(numColors)
-	if numColors < 1 then return {} end
 	local colors = {}
 	local lightnessRange = 65 - settings.minFgLightness
 	local step = lightnessRange / numColors
@@ -1738,17 +1727,14 @@ function generateColorsBySteppedLightness(numColors)
 end
 
 function generateColorsByShadesOfBaseHue(numColors)
-	if numColors < 1 then return {} end
 	return generateColorsByPalette({ settings.base.h }, numColors)
 end
 
 function generateColorsByShadesOfRandomHue(numColors)
-	if numColors < 1 then return {} end
 	return generateColorsByPalette({ math.random(0, 359) }, numColors)
 end
 
 function generateColorsByShadesOfCyclicHue(numColors)
-	if numColors < 1 then return {} end
 	return generateColorsByPalette({ math.floor(settings.generationCount * 2 % 360) }, numColors)
 end
 
@@ -1797,9 +1783,9 @@ function initColorFuncCycler()
 	settings.colorFunctions:add({ "SemiRandomFixedBaseH",   generateColorsBySemiRandomFixedBaseH   })
 	settings.colorFunctions:add({ "SemiRandomPalette",      generateColorsBySemiRandomPalette      })
 	settings.colorFunctions:add({ "RandomPalette",          generateColorsByRandomPalette          })
-	settings.colorFunctions:add({ "CustomPalette",          generateColorsByCustomPalette          })
+	settings.colorFunctions:add({ "CustomHues",             generateColorsByCustomHues             })
 
-	settings.colorFunctions:select("CustomPalette")
+	settings.colorFunctions:select("CustomHues")
 end
 
 function previousColorFunction()
@@ -1815,6 +1801,7 @@ function nextColorFunction()
 end
 
 function generateColorScheme()
+	assert(#settings.fgVars > 1, "fgVars are not set")
 	settings.shouldRecalculateDerivedColors = true
 	local colorGenFunc = settings.colorFunctions:current()[2]
 	settings.fgColors = colorGenFunc(#settings.fgVars)
