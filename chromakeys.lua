@@ -84,6 +84,8 @@ local settings = {
 		OrangeCyan            = { 25, 190 },
 		OrangeCyan2           = { 40, 180 },
 		OrangeCyan3           = { 50, 190 },
+		OrangeCyan4           = { 20, 190 },
+		OrangeCyan5           = { 20, 175 },
 		OrangeViolet          = { 25, 250 },
 		Pink                  = { 315, 320, 325, 330, 335 },
 		Red                   = { 350, 0, 10 },
@@ -101,8 +103,6 @@ local settings = {
 		VioletYellow          = { 250, 260, 60 },
 		Yellow                = { 55, 65 },
 	},
-	hue1 = 25,
-	hue2 = 250,
 	isDebugMode = false,
 	showStatusOnLoad = false,
 	generationCount = 0,
@@ -482,7 +482,7 @@ function showStatus()
 	if colorFunction == settings.CUSTOM_PALETTE_NAME then
 		colorFunction = colorFunction .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
 	elseif colorFunction == "RandomPalette" then
-		colorFunction = string.format("%s %s %s", colorFunction, settings.hue1, settings.hue2)
+		colorFunction = colorFunction .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
 	end
 	local statusInfo = padToWidth(colorFunction, 24) .. " ◼ " .. currentScopeInfoToString()
 	showMessage(statusInfo .. " ◼ " .. settings.logString)
@@ -1801,6 +1801,7 @@ function nextColorFunction()
 end
 
 function generateColorScheme()
+	-- math.randomseed(time.Now():Unix())
 	assert(#settings.fgVars > 1, "fgVars are not set")
 	settings.shouldRecalculateDerivedColors = true
 	local colorGenFunc = settings.colorFunctions:current()[2]
@@ -1840,15 +1841,20 @@ function customPaletteSetHues(bp, args)
 		end
 		if #hues > 0 then
 			settings.palettes[settings.CUSTOM_PALETTE_NAME] = hues
-			showCustomPalette()
+			settings.colorFunctions:select(settings.CUSTOM_PALETTE_NAME)
+			generateColorScheme()
 		end
 	end
+end
+
+function randomizeCustomPaletteAndGenerate()
+	randomizeCustomPalette()
+	generateColorScheme()
 end
 
 function randomizeCustomPalette()
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { math.random(0, 359), math.random(0, 359) }
 	settings.colorFunctions:select(settings.CUSTOM_PALETTE_NAME)
-	generateColorScheme()
 end
 
 
@@ -1889,6 +1895,7 @@ function init()
 	createRulesFromScheme()
 	createColorSchemeText()
 	createScratchFilesIfRequired()
+	randomizeCustomPalette()
 
 	if settings.showStatusOnLoad then
 		showStatus()
@@ -1926,7 +1933,7 @@ function init()
 	config.MakeCommand("ckNextGroup",                       nextGroup,                                                  config.NoComplete)
 	config.MakeCommand("ckPreviousColorScheme",             previousColorScheme,                                        config.NoComplete)
 	config.MakeCommand("ckNextColorScheme",                 nextColorScheme,                                            config.NoComplete)
-	config.MakeCommand("ckRandomizeCustomPalette",          randomizeCustomPalette,                                     config.NoComplete)
+	config.MakeCommand("ckRandomizeCustomPalette",          randomizeCustomPaletteAndGenerate,                          config.NoComplete)
 
 	config.MakeCommand("ckABSetA",                          setColorSchemeA,                                            config.NoComplete)
 	config.MakeCommand("ckABSetB",                          setColorSchemeB,                                            config.NoComplete)
