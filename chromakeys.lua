@@ -1770,7 +1770,6 @@ function initColorFuncCycler()
 	for paletteName, paletteHues in pairs(settings.palettes) do
 		settings.colorFunctions:add({ paletteName, createPaletteFunction(paletteName) })
 	end
-	settings.colorFunctions:add({ "RandomHue",              generateColorsByRandomHue              })
 	settings.colorFunctions:add({ "RandomHueForEveryColor", generateColorsByRandomHueForEveryColor })
 	settings.colorFunctions:add({ "AdjacentHues",           generateColorsByAdjacentHues           })
 	settings.colorFunctions:add({ "ShadesOfCyclicHue",      generateColorsByShadesOfCyclicHue      })
