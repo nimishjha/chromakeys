@@ -35,8 +35,10 @@ local settings = {
 	backgroundLightness = 6,
 	backgroundSaturation = 100,
 	commentBgLightness = 15,
-	paletteMinSaturation = 30,
-	paletteMaxSaturation = 70,
+	paletteMinSaturation = 0,
+	paletteMaxSaturation = 0,
+	saturationOptions = {},
+	saturationOption = "UNSET",
 	shouldForceUniformBrightness = false,
 	shouldEnsureSeparation = true,
 	shouldLimitChannelValues = true,
@@ -50,8 +52,8 @@ local settings = {
 	colorSchemeFolderPath = "",
 	currentColorScheme = "zzChromaKeys1",
 	colorSchemePrefix = "ck",
-	colorSchemeA = "ckGray33",
-	colorSchemeB = "ckOrange44",
+	colorSchemeA = "ckGray01",
+	colorSchemeB = "ckOrange01",
 	logString = "",
 	colorSchemeText = "",
 	hueStep = 1,
@@ -61,7 +63,6 @@ local settings = {
 	CUSTOM_PALETTE_NAME = "CustomPalette",
 	palettes = {
 		CustomPalette         = { 75, 140 },
-		Blue                  = { 210, 240 },
 		BlueCyan              = { 220, 190 },
 		BlueCyanOrange        = { 240, 210, 190, 180, 30, 40 },
 		BlueGreen             = { 210, 220, 230, 240, 130, 140 },
@@ -69,43 +70,53 @@ local settings = {
 		BlueRed               = { 220, 230, 240, 350, 0 },
 		BlueRedOrange         = { 230, 240, 250, 350, 0, 40 },
 		BlueYellow            = { 220, 240, 60 },
-		Cyan                  = { 170, 180, 190 },
-		Cyan2                 = { 160, 170 },
 		CyanBlueOrange        = { 180, 190, 220, 230, 240, 40 },
 		CyanOrange            = { 180, 190, 40 },
 		CyanYellow            = { 190, 60 },
-		Green                 = { 80, 90, 110, 120, 130, 140, 150, 160 },
-		Green2                = { 75, 155 },
 		GreenCyan             = { 110, 130, 150, 170, 180, 190 },
 		GreenYellow           = { 120, 130, 140, 160, 45, 55 },
+		MonochromeBlue        = { 210, 240 },
+		MonochromeCyan        = { 170, 180, 190 },
+		MonochromeCyan2       = { 160, 170 },
+		MonochromeGreen2      = { 75, 155 },
+		MonochromeGreen       = { 80, 90, 110, 120, 130, 140, 150, 160 },
+		MonochromeOrange      = { 20, 30 },
+		MonochromePink        = { 315, 320, 325, 330, 335 },
+		MonochromeRed         = { 350, 0, 10 },
+		MonochromeViolet      = { 250, 255, 260, 265, 270, 280 },
+		MonochromeYellow      = { 55, 65 },
 		MoreBlueLessOrange    = { 210, 220, 230, 240, 30, 40 },
-		Orange                = { 20, 30 },
 		OrangeBlue            = { 25, 240 },
-		OrangeCyan            = { 25, 190 },
 		OrangeCyan2           = { 40, 180 },
+		OrangeCyan            = { 25, 190 },
 		OrangeCyan3           = { 50, 190 },
 		OrangeCyan4           = { 20, 190 },
 		OrangeCyan5           = { 20, 175 },
 		OrangeViolet          = { 25, 250 },
-		Pink                  = { 315, 320, 325, 330, 335 },
-		Red                   = { 350, 0, 10 },
 		RedBlue               = { 350, 0, 220, 230, 240 },
 		RedPink               = { 0, 330 },
-		Violet                = { 250, 255, 260, 265, 270, 280 },
 		VioletBlue            = { 250, 260, 220 },
-		VioletGreenCyan       = { 250, 90, 190 },
 		VioletCyan            = { 250, 260, 190 },
 		VioletCyanRedOrange   = { 250, 190, 0, 20 },
 		VioletGreen           = { 250, 260, 160 },
+		VioletGreenCyan       = { 250, 90, 190 },
 		VioletOrange          = { 250, 260, 30 },
 		VioletPink            = { 250, 260, 330 },
 		VioletRed             = { 250, 260, 0 },
 		VioletYellow          = { 250, 260, 60 },
-		Yellow                = { 55, 65 },
 	},
 	isDebugMode = false,
 	showStatusOnLoad = false,
 	generationCount = 0,
+}
+
+local saturationOptions = {
+	pale    = { min = 0, max = 20 },
+	mild    = { min = 20, max = 40 },
+	medium  = { min = 40, max = 60 },
+	vivid   = { min = 60, max = 80 },
+	wild    = { min = 80, max = 100 },
+	random  = { min = 0,  max = 100 },
 }
 
 local ACTIONS = {
@@ -368,6 +379,30 @@ function toggleBooleanOption(optionName)
 	end
 end
 
+function setMinSaturation(bp, args)
+	if args ~= nil and #args > 0 then
+		local value = tonumber(args[1])
+		if type(value) == "number" and value > 0 and value < 100 then
+			settings.paletteMinSaturation = value
+			if settings.paletteMaxSaturation < settings.paletteMinSaturation then
+				settings.paletteMaxSaturation = value
+			end
+		end
+	end
+end
+
+function setMaxSaturation(bp, args)
+	if args ~= nil and #args > 0 then
+		local value = tonumber(args[1])
+		if type(value) == "number" and value > 0 and value < 100 then
+			settings.paletteMaxSaturation = value
+			if settings.paletteMinSaturation > settings.paletteMaxSaturation then
+				settings.paletteMinSaturation = value
+			end
+		end
+	end
+end
+
 function showMessage(s)
 	micro.InfoBar():Message(s)
 end
@@ -482,7 +517,7 @@ function showStatus()
 	if colorFunction == settings.CUSTOM_PALETTE_NAME or colorFunction == "RandomPalette" then
 		colorFunction = colorFunction .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
 	end
-	local statusInfo = padToWidth(colorFunction, 24) .. " ◼ " .. currentScopeInfoToString()
+	local statusInfo = padToWidth(colorFunction, 24) .. padToWidth(settings.saturationOption, 10) .. " ◼ " .. currentScopeInfoToString()
 	showMessage(statusInfo .. " ◼ " .. settings.logString)
 	settings.logString = ""
 end
@@ -1233,7 +1268,7 @@ function adjustCurrentScopeColor(action)
 		settings.shouldRecalculateDerivedColors = false
 	end
 
-	applyConstraintsToRules()
+	applyConstraints()
 	createColorSchemeText()
 	applyColorScheme()
 end
@@ -1384,7 +1419,7 @@ function createDemoRules()
 	for _, varName in ipairs(SPECIAL_SCOPES) do
 		settings.rulesMap[varName] = fgColor
 	end
-	applyConstraintsToRules()
+	applyConstraints()
 end
 
 function sanitizeScopeFromFile(scope)
@@ -1510,10 +1545,10 @@ function ensureFgBgLightness()
 	end
 end
 
-function applyConstraintsToRules()
+function applyConstraints()
 	local areRulesValid = checkRulesValidity()
 	if not areRulesValid then
-		forceLog("applyConstraintsToRules: rules are not valid, returning")
+		forceLog("applyConstraints: rules are not valid, returning")
 		return false
 	end
 
@@ -1604,28 +1639,15 @@ function generateColorsFromHues(hues, numColors)
 	local lVariance = variance
 	local hFinal, sFinal, lFinal
 
-	if settings.useBaseSL then
-		for _, hue in ipairs(hues) do
-			for _ = 1, colorsPerHue do
-				hFinal = addHue(hue, math.random(0, hVariance))
-				sFinal = clamp(s + (math.random(0, sVariance) - sVariance * 0.5), 0, 100)
-				lFinal = clamp(l + (math.random(0, lVariance) - lVariance * 0.5), 0, 100)
-				table.insert(colors, makeHsl(hFinal, sFinal, lFinal))
-				if #colors == numColors then break end
-			end
+	for _, hue in ipairs(hues) do
+		for _ = 1, colorsPerHue do
+			hFinal = addHue(hue, math.random(0, hVariance))
+			sFinal = math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation)
+			lFinal = math.random(settings.minFgLightness, 60)
+			table.insert(colors, makeHsl(hFinal, sFinal, lFinal))
 			if #colors == numColors then break end
 		end
-	else
-		for _, hue in ipairs(hues) do
-			for _ = 1, colorsPerHue do
-				hFinal = addHue(hue, math.random(0, hVariance))
-				sFinal = math.random(10, 100)
-				lFinal = math.random(settings.minFgLightness, 60)
-				table.insert(colors, makeHsl(hFinal, sFinal, lFinal))
-				if #colors == numColors then break end
-			end
-			if #colors == numColors then break end
-		end
+		if #colors == numColors then break end
 	end
 
 	shuffleExcludingFirstItem(colors)
@@ -1795,8 +1817,30 @@ function nextColorFunction()
 	showStatus()
 end
 
+function initSaturationCycler()
+	settings.saturationOptions = Cyclable.new({})
+	for optionName, _ in pairs(saturationOptions) do
+		settings.saturationOptions:add(optionName)
+	end
+	-- settings.saturationOptions:select("medium")
+	local range = saturationOptions["medium"]
+	settings.saturationOption = "medium"
+	settings.paletteMinSaturation = range.min
+	settings.paletteMaxSaturation = range.max
+end
+
+function nextSaturationOption()
+	settings.saturationOptions:next()
+	local selected = settings.saturationOptions:current()
+	local range = saturationOptions[selected]
+	settings.paletteMinSaturation = range.min
+	settings.paletteMaxSaturation = range.max
+	settings.saturationOption = selected
+	settings.backgroundSaturation = math.random(range.min, range.max)
+	generateColorScheme()
+end
+
 function generateColorScheme()
-	-- math.randomseed(time.Now():Unix())
 	assert(#settings.fgVars > 1, "fgVars are not set")
 	settings.shouldRecalculateDerivedColors = true
 	local colorGenFunc = settings.colorFunctions:current()[2]
@@ -1808,7 +1852,7 @@ function generateColorScheme()
 			settings.fgColors[index] = makeHsl(0, 0, settings.maxFgLightness)
 		end
 		createRules()
-		applyConstraintsToRules()
+		applyConstraints()
 		createColorSchemeText()
 		applyColorScheme()
 		settings.generationCount = settings.generationCount + 1
@@ -1889,6 +1933,7 @@ function init()
 	setTemplateVariables()
 	initScopeCycler()
 	initColorFuncCycler()
+	initSaturationCycler()
 	createRulesFromScheme()
 	createColorSchemeText()
 	createScratchFilesIfRequired()
@@ -1941,6 +1986,9 @@ function init()
 
 	config.MakeCommand("ckSettingsSetMaxChannelValue",      setMaxChannelValue,                                         config.NoComplete)
 	config.MakeCommand("ckSettingsToggleUseBaseSL",         toggleBooleanOption("useBaseSL"),                           config.NoComplete)
+	config.MakeCommand("ckSetMinSaturation",                setMinSaturation,                                           config.NoComplete)
+	config.MakeCommand("ckSetMaxSaturation",                setMaxSaturation,                                           config.NoComplete)
+	config.MakeCommand("ckNextSaturationOption",            nextSaturationOption,                                       config.NoComplete)
 
 	config.MakeCommand("ckSelectColorFunction",             selectColorFunction,                                        config.NoComplete)
 end
