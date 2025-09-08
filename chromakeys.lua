@@ -42,7 +42,7 @@ local settings = {
 	shouldLimitChannelValues = true,
 	shouldLockFgDefaultToBaseColor = false,
 	shouldRecalculateDerivedColors = true,
-	shouldAdjustPerceptualBrightness = true,
+	shouldAdjustPerceptualBrightness = false,
 	shouldForceOneColorToWhite = false,
 	maxChannelValue = 200,
 	rulesMap = {},
@@ -309,7 +309,7 @@ function logTable(tableInstance, indentLevel)
 	assert(type(tableInstance) == "table", "Expected table, received " .. type(tableInstance))
 	if not indentLevel then indentLevel = 0 end
 	for key, value in pairs(tableInstance) do
-		indentString = string.rep("\t", indentLevel) .. key .. " = "
+		local indentString = string.rep("\t", indentLevel) .. key .. " = "
 	  	if type(value) == "table" then
 			forceLog(indentString .. "(table)")
 			logTable(value, indentLevel+1)
@@ -479,9 +479,7 @@ end
 
 function showStatus()
 	local colorFunction = settings.colorFunctions:current()[1]
-	if colorFunction == settings.CUSTOM_PALETTE_NAME then
-		colorFunction = colorFunction .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
-	elseif colorFunction == "RandomPalette" then
+	if colorFunction == settings.CUSTOM_PALETTE_NAME or colorFunction == "RandomPalette" then
 		colorFunction = colorFunction .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
 	end
 	local statusInfo = padToWidth(colorFunction, 24) .. " ◼ " .. currentScopeInfoToString()
@@ -707,11 +705,11 @@ function nextGroup()
 	end
 	local currentScheme = config.GetGlobalOption("colorscheme")
 	local currentGroup = string.gsub(currentScheme, "%d+", "")
-	local nextGroup = getNextString(settings.colorSchemeGroups, currentGroup)
+	local nextGroupName = getNextString(settings.colorSchemeGroups, currentGroup)
 
 	local found = false
 	for _, schemeName in ipairs(settings.colorSchemes) do
-		if string.gsub(schemeName, "%d+", "") == nextGroup then
+		if string.gsub(schemeName, "%d+", "") == nextGroupName then
 			found = true
 			selectColorScheme(schemeName)
 			break
