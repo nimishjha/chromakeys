@@ -1590,11 +1590,9 @@ function getVarianceBasedOnNumberOfHues(numHues)
 	return variance
 end
 
-function generateColorsByPalette(hues, numColors)
-	if #hues == 0 then
-		showMessage(string.format("Palette '%s' is empty", paletteName))
-		return {}
-	end
+function generateColorsFromHues(hues, numColors)
+	assert(type(hues) == "table" and #hues > 0 and type(numColors) == "number" and numColors > 0, "invalid arguments")
+
 	local colorsPerHue = math.ceil(numColors / #hues)
 	local colors = {}
 	local s = settings.base.s
@@ -1638,17 +1636,17 @@ end
 function createPaletteFunction(paletteName)
 	return function(numColors)
 		local hues = settings.palettes[paletteName]
-		return generateColorsByPalette(hues, numColors)
+		return generateColorsFromHues(hues, numColors)
 	end
 end
 
 function generateColorsByRandomPalette(numColors)
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { math.random(0, 359), math.random(0, 359) }
-	return generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
+	return generateColorsFromHues(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 end
 
 function generateColorsByCustomHues(numColors)
-	return generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
+	return generateColorsFromHues(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 end
 
 function generateColorsBySemiRandomPalette(numColors)
@@ -1657,17 +1655,17 @@ function generateColorsBySemiRandomPalette(numColors)
 	else
 		settings.palettes[settings.CUSTOM_PALETTE_NAME] = { math.random(0, 359), settings.base.h }
 	end
-	return generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
+	return generateColorsFromHues(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 end
 
 function generateColorsBySemiRandomFixedBaseH(numColors)
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { settings.base.h, math.random(0, 359) }
-	return generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
+	return generateColorsFromHues(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 end
 
 function generateColorsBySemiRandomFixedBaseHS(numColors)
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { settings.base.h, math.random(0, 359) }
-	local colors = generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
+	local colors = generateColorsFromHues(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 	colors[1].h = settings.base.h
 	colors[1].s = settings.base.s
 	return colors
@@ -1675,7 +1673,7 @@ end
 
 function generateColorsBySemiRandomFixedBaseHSL(numColors)
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { settings.base.h, math.random(0, 359) }
-	local colors = generateColorsByPalette(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
+	local colors = generateColorsFromHues(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 	colors[1] = settings.base
 	return colors
 end
@@ -1690,7 +1688,7 @@ function generateColorsByAdjacentHues(numColors)
 		table.insert(hues, hue)
 	end
 
-	return generateColorsByPalette(hues, numColors)
+	return generateColorsFromHues(hues, numColors)
 end
 
 function generateColorsByRandomHueForEveryColor(numColors)
@@ -1700,7 +1698,7 @@ function generateColorsByRandomHueForEveryColor(numColors)
 		table.insert(hues, hue)
 	end
 
-	return generateColorsByPalette(hues, numColors)
+	return generateColorsFromHues(hues, numColors)
 end
 
 function generateColorsByRandomLightness(numColors)
@@ -1725,15 +1723,15 @@ function generateColorsBySteppedLightness(numColors)
 end
 
 function generateColorsByShadesOfBaseHue(numColors)
-	return generateColorsByPalette({ settings.base.h }, numColors)
+	return generateColorsFromHues({ settings.base.h }, numColors)
 end
 
 function generateColorsByShadesOfRandomHue(numColors)
-	return generateColorsByPalette({ math.random(0, 359) }, numColors)
+	return generateColorsFromHues({ math.random(0, 359) }, numColors)
 end
 
 function generateColorsByShadesOfCyclicHue(numColors)
-	return generateColorsByPalette({ math.floor(settings.generationCount * 2 % 360) }, numColors)
+	return generateColorsFromHues({ math.floor(settings.generationCount * 2 % 360) }, numColors)
 end
 
 
@@ -1832,7 +1830,7 @@ function customPaletteSetHues(bp, args)
 		local hues = {}
 		for i = 1, #args do
 			local hue = tonumber(args[i])
-			if type(hue) == "number" then
+			if type(hue) == "number" and hue >= 0 and hue <= 360 then
 				table.insert(hues, hue)
 			end
 		end
@@ -1840,6 +1838,8 @@ function customPaletteSetHues(bp, args)
 			settings.palettes[settings.CUSTOM_PALETTE_NAME] = hues
 			settings.colorFunctions:select(settings.CUSTOM_PALETTE_NAME)
 			generateColorScheme()
+		else
+			showMessage("No valid hues were provided")
 		end
 	end
 end
