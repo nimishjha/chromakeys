@@ -27,7 +27,7 @@ local settings = {
 		l = 50
 	},
 	scopes = {},
-	colorFunctions = {},
+	colorFunctionNames = {},
 	uniformBrightness = 60,
 	minFgLightness = 35,
 	maxFgLightness = 75,
@@ -38,7 +38,6 @@ local settings = {
 	paletteMinSaturation = 0,
 	paletteMaxSaturation = 0,
 	saturationOptions = {},
-	saturationOption = "UNSET",
 	shouldForceUniformBrightness = false,
 	shouldEnsureSeparation = true,
 	shouldLimitChannelValues = true,
@@ -71,6 +70,7 @@ local settings = {
 		BlueRedOrange         = { 230, 240, 250, 350, 0, 40 },
 		BlueYellow            = { 220, 240, 60 },
 		CyanBlueOrange        = { 180, 190, 220, 230, 240, 40 },
+		CyanGreen             = { 190, 80 },
 		CyanOrange            = { 180, 190, 40 },
 		CyanYellow            = { 190, 60 },
 		GreenCyan             = { 110, 130, 150, 170, 180, 190 },
@@ -96,7 +96,7 @@ local settings = {
 		RedBlue               = { 350, 0, 220, 230, 240 },
 		RedPink               = { 0, 330 },
 		VioletBlue            = { 250, 260, 220 },
-		VioletCyan            = { 250, 260, 190 },
+		VioletCyan            = { 250, 190 },
 		VioletCyanRedOrange   = { 250, 190, 0, 20 },
 		VioletGreen           = { 250, 260, 160 },
 		VioletGreenCyan       = { 250, 90, 190 },
@@ -118,6 +118,8 @@ local saturationOptions = {
 	wild    = { min = 80, max = 100 },
 	random  = { min = 0,  max = 100 },
 }
+
+local colorFunctions = {}
 
 local ACTIONS = {
 	HUE_INCREASE              = 1,
@@ -227,7 +229,7 @@ end
 
 function Cyclable:select(key)
 	for index, value in ipairs(self.variables) do
-		if value[1] == key then
+		if value == key then
 			self.currentIndex = index
 			self.currentVariable = self.variables[self.currentIndex]
 		end
@@ -236,7 +238,7 @@ end
 
 function Cyclable:debug()
 	for _, value in pairs(self.variables) do
-		forceLog(value[1])
+		forceLog(value)
 	end
 	forceLog("currentIndex: " .. tostring(self.currentIndex) .. ", current: " .. tostring(self:current()))
 end
@@ -333,7 +335,7 @@ function logTable(tableInstance, indentLevel)
 end
 
 function getColorFunctionNames()
-	local functionsByName = settings.colorFunctions:getVariables()
+	local functionsByName = settings.colorFunctionNames:getVariables()
 	local functionNames = {}
 	for _, tbl in pairs(functionsByName) do
 		table.insert(functionNames, tbl[1])
@@ -347,7 +349,7 @@ function selectColorFunction(bp, args)
 		local colorFunctionNames = getColorFunctionNames()
 		local matches = getMatchingStrings(colorFunctionNames, string.lower(args[1]))
 		if #matches == 1 then
-			settings.colorFunctions:select(matches[1])
+			settings.colorFunctionNames:select(matches[1])
 			showStatus()
 		else
 			local s = ""
@@ -513,11 +515,11 @@ function addLog(str)
 end
 
 function showStatus()
-	local colorFunction = settings.colorFunctions:current()[1]
+	local colorFunction = settings.colorFunctionNames:current()
 	if colorFunction == settings.CUSTOM_PALETTE_NAME or colorFunction == "RandomPalette" then
 		colorFunction = colorFunction .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
 	end
-	local statusInfo = padToWidth(colorFunction, 24) .. padToWidth(settings.saturationOption, 10) .. " ◼ " .. currentScopeInfoToString()
+	local statusInfo = padToWidth(colorFunction, 24) .. padToWidth(settings.saturationOptions:current(), 10) .. " ◼ " .. currentScopeInfoToString()
 	showMessage(statusInfo .. " ◼ " .. settings.logString)
 	settings.logString = ""
 end
@@ -1552,7 +1554,6 @@ function applyConstraints()
 		return false
 	end
 
-	-- settings.rulesMap.fgDefault.l = getDimmestColor(settings.fgColors).l
 	ensureFgBgLightness()
 
 	local fg = settings.rulesMap.fgDefault
@@ -1664,10 +1665,6 @@ end
 
 function generateColorsByRandomPalette(numColors)
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { math.random(0, 359), math.random(0, 359) }
-	return generateColorsFromHues(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
-end
-
-function generateColorsByCustomHues(numColors)
 	return generateColorsFromHues(settings.palettes[settings.CUSTOM_PALETTE_NAME], numColors)
 end
 
@@ -1784,35 +1781,39 @@ function nextScope()
 end
 
 function initColorFuncCycler()
-	settings.colorFunctions = Cyclable.new({})
 	for paletteName, paletteHues in pairs(settings.palettes) do
-		settings.colorFunctions:add({ paletteName, createPaletteFunction(paletteName) })
+		colorFunctions[paletteName] = createPaletteFunction(paletteName)
 	end
-	settings.colorFunctions:add({ "RandomHueForEveryColor", generateColorsByRandomHueForEveryColor })
-	settings.colorFunctions:add({ "AdjacentHues",           generateColorsByAdjacentHues           })
-	settings.colorFunctions:add({ "ShadesOfCyclicHue",      generateColorsByShadesOfCyclicHue      })
-	settings.colorFunctions:add({ "ShadesOfBaseHue",        generateColorsByShadesOfBaseHue        })
-	settings.colorFunctions:add({ "ShadesOfRandomHue",      generateColorsByShadesOfRandomHue      })
-	settings.colorFunctions:add({ "RandomLightness",        generateColorsByRandomLightness        })
-	settings.colorFunctions:add({ "SteppedLightness",       generateColorsBySteppedLightness       })
-	settings.colorFunctions:add({ "SemiRandomFixedBaseHSL", generateColorsBySemiRandomFixedBaseHSL })
-	settings.colorFunctions:add({ "SemiRandomFixedBaseHS",  generateColorsBySemiRandomFixedBaseHS  })
-	settings.colorFunctions:add({ "SemiRandomFixedBaseH",   generateColorsBySemiRandomFixedBaseH   })
-	settings.colorFunctions:add({ "SemiRandomPalette",      generateColorsBySemiRandomPalette      })
-	settings.colorFunctions:add({ "RandomPalette",          generateColorsByRandomPalette          })
-	settings.colorFunctions:add({ "CustomHues",             generateColorsByCustomHues             })
 
-	settings.colorFunctions:select("CustomHues")
+	colorFunctions.RandomHueForEveryColor = generateColorsByRandomHueForEveryColor
+	colorFunctions.AdjacentHues           = generateColorsByAdjacentHues
+	colorFunctions.ShadesOfCyclicHue      = generateColorsByShadesOfCyclicHue
+	colorFunctions.ShadesOfBaseHue        = generateColorsByShadesOfBaseHue
+	colorFunctions.ShadesOfRandomHue      = generateColorsByShadesOfRandomHue
+	colorFunctions.RandomLightness        = generateColorsByRandomLightness
+	colorFunctions.SteppedLightness       = generateColorsBySteppedLightness
+	colorFunctions.SemiRandomFixedBaseHSL = generateColorsBySemiRandomFixedBaseHSL
+	colorFunctions.SemiRandomFixedBaseHS  = generateColorsBySemiRandomFixedBaseHS
+	colorFunctions.SemiRandomFixedBaseH   = generateColorsBySemiRandomFixedBaseH
+	colorFunctions.SemiRandomPalette      = generateColorsBySemiRandomPalette
+	colorFunctions.RandomPalette          = generateColorsByRandomPalette
+
+	settings.colorFunctionNames = Cyclable.new({})
+	for colorFunctionName, _ in pairs(colorFunctions) do
+		settings.colorFunctionNames:add(colorFunctionName)
+	end
+
+	settings.colorFunctionNames:select("CustomPalette")
 end
 
 function previousColorFunction()
-	settings.colorFunctions:previous()
+	settings.colorFunctionNames:previous()
 	generateColorScheme()
 	showStatus()
 end
 
 function nextColorFunction()
-	settings.colorFunctions:next()
+	settings.colorFunctionNames:next()
 	generateColorScheme()
 	showStatus()
 end
@@ -1822,20 +1823,17 @@ function initSaturationCycler()
 	for optionName, _ in pairs(saturationOptions) do
 		settings.saturationOptions:add(optionName)
 	end
-	-- settings.saturationOptions:select("medium")
-	local range = saturationOptions["medium"]
-	settings.saturationOption = "medium"
+	settings.saturationOptions:select("medium")
+	local range = saturationOptions[settings.saturationOptions:current()]
 	settings.paletteMinSaturation = range.min
 	settings.paletteMaxSaturation = range.max
 end
 
 function nextSaturationOption()
 	settings.saturationOptions:next()
-	local selected = settings.saturationOptions:current()
-	local range = saturationOptions[selected]
+	local range = saturationOptions[settings.saturationOptions:current()]
 	settings.paletteMinSaturation = range.min
 	settings.paletteMaxSaturation = range.max
-	settings.saturationOption = selected
 	settings.backgroundSaturation = math.random(range.min, range.max)
 	generateColorScheme()
 end
@@ -1843,7 +1841,12 @@ end
 function generateColorScheme()
 	assert(#settings.fgVars > 1, "fgVars are not set")
 	settings.shouldRecalculateDerivedColors = true
-	local colorGenFunc = settings.colorFunctions:current()[2]
+	forceLog(settings.colorFunctionNames:current())
+	local colorGenFunc = colorFunctions[settings.colorFunctionNames:current()]
+	if type(colorGenFunc) ~= "function" then
+		showMessage(string.format("colorGenFunc: expected function, received %s", type(colorGenFunc)))
+		return
+	end
 	settings.fgColors = colorGenFunc(#settings.fgVars)
 
 	if #settings.fgColors == #settings.fgVars then
@@ -1880,7 +1883,7 @@ function customPaletteSetHues(bp, args)
 		end
 		if #hues > 0 then
 			settings.palettes[settings.CUSTOM_PALETTE_NAME] = hues
-			settings.colorFunctions:select(settings.CUSTOM_PALETTE_NAME)
+			settings.colorFunctionNames:select(settings.CUSTOM_PALETTE_NAME)
 			generateColorScheme()
 		else
 			showMessage("No valid hues were provided")
@@ -1895,7 +1898,7 @@ end
 
 function randomizeCustomPalette()
 	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { math.random(0, 359), math.random(0, 359) }
-	settings.colorFunctions:select(settings.CUSTOM_PALETTE_NAME)
+	settings.colorFunctionNames:select(settings.CUSTOM_PALETTE_NAME)
 end
 
 
