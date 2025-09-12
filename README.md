@@ -63,6 +63,8 @@ You'll need to bind the following commands to keyboard shortcuts of your choice.
 "Shift-F10":		"command:ckSaturationDecLarge",
 "Shift-F11":		"command:ckLightnessDecLarge",
 
+"Alt-F8":			"command:ckNextSaturationOption",
+
 "Shift-F12":		"command:ckToggleDebugMode",
 "Alt-L":			"command:ckForceLogRules",
 ```
@@ -77,6 +79,11 @@ Examples:
 ```
 ckCustomPaletteSetHues 35 190
 ckCustomPaletteSetHues 35 190 240 250 280 0 330
+```
+
+To bind this to a keyboard shortcut, say `Ctrl-b`, put this in `bindings.json`:
+```
+"Ctrl-b":			"command-edit:ckCustomPaletteSetHues ",
 ```
 
 ### `ckSettingsSetMaxChannelValue`
@@ -103,7 +110,24 @@ ckSelectColorFunction cyclic
 
 ### Basic Usage
 
-To get an idea of what ChromaKeys can do, hit `F8` (or `Alt-G`, or `Alt-3`) a few times. Use `Alt-1` and `Alt-2` to cycle through the available color generation functions.
+(This assumes you're using the default keyboard shortcuts.)
+
+To get an idea of what ChromaKeys can do, press `F8` a few times. Then press `Shift-F8` a few times.
+
+Press `Alt-1` to switch to the `RandomPalette` mode. Press `F8` a few times.
+
+Use `Alt-1` and `Alt-2` to cycle through the available color scheme generation modes.
+
+The modes should be self-explanatory:
+
+- `RandomPalette` generates palettes with two entirely random hues.
+- `SemiRandomPalette` generates palettes from the base hue and one random hue. The default color may use either the base hue or the random hue.
+- `SemiRandomFixedBaseH` does the same as `SemiRandomPalette`, but the default color always uses the base hue with random saturation and lightness.
+- `SemiRandomFixedBaseHS` does the same as `SemiRandomPalette`, but the default color always uses the base hue and saturation, and random lightness.
+- `SemiRandomFixedBaseHSL` does the same as `SemiRandomPalette`, but the default color always uses the base hue, saturation and lightness.
+- `AdjacentHues` uses hues adjacent to the base hue.
+
+And so on.
 
 ### Manual color scheme creation (adjust individual scopes separately)
 
@@ -135,16 +159,20 @@ The `ckPreviousColorFunction` (Alt-1) and `ckNextColorFunction` (Alt-2) commands
 
 The plugin comes with a range of pre-selected palettes. Or if you prefer to make your own, use the `RandomPalette` function to generate color schemes until you find a palette you like, then switch to the `Custom` function (It's right next to the `RandomPalette` function, so if you're using the default bindings you just need to press `Alt-2`.). You can then generate color schemes using that palette.
 
+To select a saturation range for the generated colors, use `ckNextSaturationOption` (Alt-F8). Or use the `ckSetMinSaturation` and `ckSetMaxSaturation` commands.
+
 If you prefer to set the custom palette hues manually, or if you want more than two base hues, you can use the command `ckCustomPaletteSetHues <hue1> <hue2> ... <hueN>`.
 
 ## Concepts
 
-Essentially, you choose a scope (a highlight group), and adjust its color. There are four special scopes:
+When generating entire color schemes, you select a palette (or a palette generator function) and press `F8` until you get a color scheme you like.
+
+When creating color schemes manually, you choose a scope (a highlight group), and adjust its color. There are four special scopes:
 
 - `base`: This sets the base color. If you're creating a color scheme manually (as opposed to using the palettes), this is the first scope you need to set.
 - `all`: This applies the command to all scopes. Useful if you want to adjust the hue/saturation/lightness of the entire scheme.
 - `allExceptFgDefault`: This adjusts everything but the foreground scope color (and the scope colors derived from it - see below).
-- `allExceptFgDefaultAsOne`: Same as allExceptFgDefault, but it changes all the affected scopes in lockstep.
+- `allExceptFgDefaultAsOne`: Same as `allExceptFgDefault`, but it changes all the affected scopes in lockstep.
 
 ### Derived scope colors
 
@@ -169,7 +197,7 @@ Use `ckSaveCurrentTheme` (F1). This will save the color scheme with a name based
 
 ## Navigating color schemes
 
-Use `ckNextColorScheme` and `ckPreviousColorScheme`. There is also `ckNextGroup` which takes you to the first scheme in the next color group (ckBlueNN, ckCyan01, ckGray01, ckOrange01 and so on). `ckFirstColorScheme` will take you to the first scheme in the entire folder.
+Use `ckNextColorScheme` (Alt-l) and `ckPreviousColorScheme` (Alt-k). There is also `ckNextGroup` (Alt-h) which takes you to the first scheme in the next color group (ckBlueNN, ckCyan01, ckGray01, ckOrange01 and so on). `ckFirstColorScheme` (Alt-j) will take you to the first scheme in the entire folder.
 
 ## A-B comparisons
 
@@ -183,7 +211,7 @@ ChromaKeys can only work with files in your user-specific micro colorschemes fol
 
 ### Why is there no support for color schemes with light backgrounds?
 
-Well, color schemes with light backgrounds are an abomination, but there's also a practical reason: there's no way I could tolerate staring at a glaring white screen long enough to be able to implement support for them.
+Well, color schemes with light backgrounds are an abomination, but there's another reason: there's no way I could tolerate staring at a glaring white screen long enough to be able to implement support for them.
 
 ### I don't like writing ~1KB to my SSD every time I press a key.
 
