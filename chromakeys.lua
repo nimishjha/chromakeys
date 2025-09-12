@@ -30,7 +30,7 @@ local settings = {
 	colorFunctionNames = {},
 	uniformBrightness = 60,
 	minFgLightness = 35,
-	maxFgLightness = 75,
+	maxFgLightness = 70,
 	maxBgLightness = 15,
 	backgroundLightness = 6,
 	backgroundSaturation = 100,
@@ -57,7 +57,7 @@ local settings = {
 	colorSchemeText = "",
 	hueStep = 1,
 	saturationStep = 1,
-	lightnessStep = 0.25,
+	lightnessStep = 0.5,
 	hueCycleStep = 10,
 	CUSTOM_PALETTE_NAME = "CustomPalette",
 	palettes = {
@@ -111,12 +111,13 @@ local settings = {
 }
 
 local saturationOptions = {
-	pale    = { min = 0, max = 20 },
-	mild    = { min = 20, max = 40 },
-	medium  = { min = 40, max = 60 },
-	vivid   = { min = 60, max = 80 },
-	wild    = { min = 80, max = 100 },
-	random  = { min = 0,  max = 100 },
+	grayscale = { min = 0, max = 0 },
+	pale      = { min = 10, max = 20 },
+	mild      = { min = 20, max = 40 },
+	medium    = { min = 40, max = 60 },
+	vivid     = { min = 60, max = 80 },
+	wild      = { min = 80, max = 100 },
+	random    = { min = 40,  max = 100 },
 }
 
 local colorFunctions = {}
@@ -515,11 +516,11 @@ function addLog(str)
 end
 
 function showStatus()
-	local colorFunction = settings.colorFunctionNames:current()
-	if colorFunction == settings.CUSTOM_PALETTE_NAME or colorFunction == "RandomPalette" then
-		colorFunction = colorFunction .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
+	local colorFunctionName = settings.colorFunctionNames:current()
+	if colorFunctionName == settings.CUSTOM_PALETTE_NAME or colorFunctionName == "RandomPalette" then
+		colorFunctionName = colorFunctionName .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
 	end
-	local statusInfo = padToWidth(colorFunction, 24) .. padToWidth(settings.saturationOptions:current(), 10) .. " ◼ " .. currentScopeInfoToString()
+	local statusInfo = padToWidth(colorFunctionName, 24) .. " " .. padToWidth(settings.saturationOptions:current(), 10) .. " ◼ " .. currentScopeInfoToString()
 	showMessage(statusInfo .. " ◼ " .. settings.logString)
 	settings.logString = ""
 end
@@ -909,6 +910,7 @@ function ensureSeparationFromDefault(...)
 	for _, scope in ipairs({ ... }) do
 		local color = settings.rulesMap[scope]
 		if colorsAreTooClose(color, fgColor) then
+			color.l = fgColor.l
 			setScopeColor(scope, varyLightness(color, 10))
 		end
 	end
@@ -1264,11 +1266,7 @@ function adjustCurrentScopeColor(action)
 		[SPECIAL_SCOPES.ALL_EXCEPT_FGDEFAULT] = true,
 	}
 
-	if scopesThatTriggerRecalculationOfDerivedColors[currentScope] then
-		settings.shouldRecalculateDerivedColors = true
-	else
-		settings.shouldRecalculateDerivedColors = false
-	end
+	settings.shouldRecalculateDerivedColors = scopesThatTriggerRecalculationOfDerivedColors[currentScope]
 
 	applyConstraints()
 	createColorSchemeText()
@@ -1277,6 +1275,7 @@ end
 
 function setBaseColor(hsl)
 	settings.base = hsl
+	settings.palettes[settings.CUSTOM_PALETTE_NAME][1] = settings.base.h
 end
 
 function setBackgroundColor(hsl)
@@ -1314,18 +1313,34 @@ end
 function adjustPerceptualBrightness(hsl)
 	local hueKey = math.floor(hsl.h / 10) * 10
 	local adjustmentLookup = {
-		[210] = 4,
-		[220] = 9,
-		[230] = 12,
-		[240] = 16,
-		[250] = 14,
-		[260] = 12,
-		[270] = 11,
-		[280] = 9,
+		[50]  = -2,
+		[60]  = -4,
+		[70]  = -4,
+		[80]  = -5,
+		[90]  = -5,
+		[100] = -5,
+		[110] = -5,
+		[120] = -5,
+		[130] = -5,
+		[140] = -5,
+		[150] = -5,
+		[160] = -7,
+		[170] = -7,
+		[180] = -7,
+		[190] = -5,
+		[200] = -5,
+		[210] = -3,
+		[220] = 5,
+		[230] = 5,
+		[240] = 5,
+		[250] = 5,
+		[260] = 5,
+		[270] = 5,
+		[280] = 5,
 	}
 	local adjustment = adjustmentLookup[hueKey]
 	if adjustment ~= nil then
-		hsl.l = math.min(hsl.l + adjustment, 100)
+		hsl.l = math.min(hsl.l + adjustment, settings.maxFgLightness)
 	end
 	return hsl
 end
@@ -1374,6 +1389,14 @@ function deriveBgCommentFromFgComment()
 	setScopeColor("calcBgComment", forceLightness(settings.rulesMap.fgComment, settings.commentBgLightness))
 end
 
+function deriveFgSymbol(hsl)
+	if settings.base.s > 0 then
+		return varyLightness(varySaturation(hsl, 15), 5)
+	else
+		return varyLightness(hsl, 10)
+	end
+end
+
 function getDimmestColor(hslColors)
 	local minL = 100
 	local dimmestColorIndex = 1
@@ -1399,6 +1422,7 @@ function createRules()
 	if settings.shouldLockFgDefaultToBaseColor then
 		setScopeColor("fgDefault", settings.base)
 	end
+
 	if settings.shouldAdjustPerceptualBrightness then
 		for _, varName in ipairs(settings.fgVars) do
 			settings.rulesMap[varName] = adjustPerceptualBrightness(settings.rulesMap[varName])
@@ -1407,7 +1431,7 @@ function createRules()
 end
 
 function createDemoRules()
-	local fgColor = settings.base
+	local fgColor = makeHsl(settings.base.h, settings.base.s, settings.base.l)
 	local bgColor = dimForBackground(fgColor)
 	for _, varName in ipairs(settings.fgVars) do
 		settings.rulesMap[varName] = fgColor
@@ -1560,7 +1584,7 @@ function applyConstraints()
 	local bg = settings.rulesMap.bgDefault
 
 	if settings.shouldRecalculateDerivedColors then
-		settings.rulesMap.fgSymbol                = varyLightness(fg, 15)
+		settings.rulesMap.fgSymbol                = deriveFgSymbol(fg)
 		settings.rulesMap.fgComment               = clampLightness(settings.rulesMap.fgComment, 50, 75)
 		settings.rulesMap.calcBgComment           = forceLightness(settings.rulesMap.fgComment, 15)
 		settings.rulesMap.calcFgStatusLine        = clampSaturation(forceLightness(fg, 35), 0, 35)
@@ -1605,8 +1629,6 @@ function createColorSchemeText()
 	settings.colorSchemeText = replaceVariables(colorSchemeTemplate, settings.rulesMap)
 end
 
-
-
 function getVarianceBasedOnNumberOfHues(numHues)
 	local varianceLookup = {
 		[1] = 60,
@@ -1631,20 +1653,15 @@ function generateColorsFromHues(hues, numColors)
 
 	local colorsPerHue = math.ceil(numColors / #hues)
 	local colors = {}
-	local s = settings.base.s
-	local l = settings.base.l
 
 	local hVariance = 10
-	local variance = getVarianceBasedOnNumberOfHues(#hues)
-	local sVariance = variance
-	local lVariance = variance
 	local hFinal, sFinal, lFinal
 
 	for _, hue in ipairs(hues) do
 		for _ = 1, colorsPerHue do
 			hFinal = addHue(hue, math.random(0, hVariance))
 			sFinal = math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation)
-			lFinal = math.random(settings.minFgLightness, 60)
+			lFinal = math.random(settings.minFgLightness, settings.maxFgLightness)
 			table.insert(colors, makeHsl(hFinal, sFinal, lFinal))
 			if #colors == numColors then break end
 		end
@@ -1699,10 +1716,10 @@ end
 
 function generateColorsByAdjacentHues(numColors)
 	local hue = settings.base.h
-	local hueStep = math.random(3, 6)
 	local hues = {}
-
-	for _ = 1, 4 do
+	local numHues = math.random(2, 4)
+	local hueStep = numHues == 2 and math.random(5, 20) or math.random(3, 6)
+	for _ = 1, numHues do
 		hue = addHue(hue, hueStep)
 		table.insert(hues, hue)
 	end
@@ -1723,7 +1740,7 @@ end
 function generateColorsByRandomLightness(numColors)
 	local colors = {}
 	for _ = 1, numColors do
-		table.insert(colors, makeHsl(settings.base.h, settings.base.s, math.random(settings.minFgLightness, 60)))
+		table.insert(colors, makeHsl(settings.base.h, math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation), math.random(settings.minFgLightness, 60)))
 	end
 	return colors
 end
@@ -1734,7 +1751,7 @@ function generateColorsBySteppedLightness(numColors)
 	local step = lightnessRange / numColors
 	local lightness = settings.minFgLightness
 	for _ = 1, numColors do
-		table.insert(colors, makeHsl(settings.base.h, settings.base.s, lightness))
+		table.insert(colors, makeHsl(settings.base.h, math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation), lightness))
 		lightness = lightness + step
 	end
 	shuffle(colors)
@@ -1786,12 +1803,12 @@ function initColorFuncCycler()
 	end
 
 	colorFunctions.RandomHueForEveryColor = generateColorsByRandomHueForEveryColor
-	colorFunctions.AdjacentHues           = generateColorsByAdjacentHues
 	colorFunctions.ShadesOfCyclicHue      = generateColorsByShadesOfCyclicHue
 	colorFunctions.ShadesOfBaseHue        = generateColorsByShadesOfBaseHue
 	colorFunctions.ShadesOfRandomHue      = generateColorsByShadesOfRandomHue
 	colorFunctions.RandomLightness        = generateColorsByRandomLightness
 	colorFunctions.SteppedLightness       = generateColorsBySteppedLightness
+	colorFunctions.AdjacentHues           = generateColorsByAdjacentHues
 	colorFunctions.SemiRandomFixedBaseHSL = generateColorsBySemiRandomFixedBaseHSL
 	colorFunctions.SemiRandomFixedBaseHS  = generateColorsBySemiRandomFixedBaseHS
 	colorFunctions.SemiRandomFixedBaseH   = generateColorsBySemiRandomFixedBaseH
@@ -1897,7 +1914,7 @@ function randomizeCustomPaletteAndGenerate()
 end
 
 function randomizeCustomPalette()
-	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { math.random(0, 359), math.random(0, 359) }
+	settings.palettes[settings.CUSTOM_PALETTE_NAME] = { settings.base.h, math.random(0, 359) }
 	settings.colorFunctionNames:select(settings.CUSTOM_PALETTE_NAME)
 end
 
