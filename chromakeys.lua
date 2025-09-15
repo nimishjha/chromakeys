@@ -64,27 +64,31 @@ local settings = {
 		CustomPalette = { 75, 140 },
 	},
 	palettesWithNamedHues = {
-		BlueGreen     = { "blue", "green" },
-		BlueGreen2    = { "blue", "green", "green" },
-		BlueOrange    = { "blue", "orange" },
-		BlueRed       = { "blue", "red" },
-		BlueYellow    = { "blue", "yellow" },
-		CyanOrange    = { "cyan", "orange" },
-		CyanYellow    = { "cyan", "yellow" },
-		GreenCyan     = { "green", "cyan" },
-		GreenYellow   = { "green", "yellow" },
-		OrangeBlue    = { "orange", "blue" },
-		OrangeCyan    = { "orange", "cyan" },
-		OrangeViolet  = { "orange", "violet" },
-		RedBlue       = { "red", "blue" },
-		RedPink       = { "red", "pink" },
-		VioletBlue    = { "violet", "blue" },
-		VioletCyan    = { "violet", "cyan" },
-		VioletGreen   = { "violet", "green" },
-		VioletOrange  = { "violet", "orange" },
-		VioletRed     = { "violet", "red" },
-		VioletPink    = { "violet", "pink" },
-		VioletYellow  = { "violet", "yellow" },
+		BlueGreen       = { "blue",   "green"  },
+		BlueGreenCyan   = { "blue",   "green", "cyan"  },
+		BlueOrange      = { "blue",   "orange" },
+		BlueRed         = { "blue",   "red"    },
+		BlueYellow      = { "blue",   "yellow" },
+		CyanGreen       = { "cyan",   "green"  },
+		CyanOrange      = { "cyan",   "orange" },
+		CyanYellow      = { "cyan",   "yellow" },
+		GreenCyan       = { "green",  "cyan"   },
+		OrangeBlue      = { "orange", "blue"   },
+		OrangeCyan      = { "orange", "cyan"   },
+		OrangeViolet    = { "orange", "violet" },
+		PurpleOrange    = { "purple", "orange" },
+		PurplePink      = { "purple", "pink"   },
+		RedBlue         = { "red",    "blue"   },
+		RedCyan         = { "red",    "cyan"   },
+		RedPink         = { "red",    "pink"   },
+		VioletBlue      = { "violet", "blue"   },
+		VioletCyan      = { "violet", "cyan"   },
+		VioletGreenCyan = { "violet", "green", "cyan"  },
+		VioletGreen     = { "violet", "green"  },
+		VioletOrange    = { "violet", "orange" },
+		VioletPink      = { "violet", "pink"   },
+		VioletRed       = { "violet", "red"    },
+		VioletYellow    = { "violet", "yellow" },
 	},
 	isDebugMode = false,
 	showStatusOnLoad = false,
@@ -340,19 +344,9 @@ function logTable(tableInstance, indentLevel)
 	end
 end
 
-function getColorFunctionNames()
-	local functionsByName = settings.colorFunctionNames:getVariables()
-	local functionNames = {}
-	for _, tbl in pairs(functionsByName) do
-		table.insert(functionNames, tbl[1])
-	end
-	forceLog(table.concat(functionNames, " | "))
-	return functionNames
-end
-
 function selectColorFunction(bp, args)
 	if args[1] ~= nil then
-		local colorFunctionNames = getColorFunctionNames()
+		local colorFunctionNames = settings.colorFunctionNames:getVariables()
 		local matches = getMatchingStrings(colorFunctionNames, string.lower(args[1]))
 		if #matches == 1 then
 			settings.colorFunctionNames:select(matches[1])
@@ -1673,14 +1667,14 @@ function getNumericHueFromHueName(hueName)
 		else
 			return math.random(340, 359)
 		end
-	elseif hueName == "orange" then return math.random(30, 50)
-	elseif hueName == "yellow" then return math.random(55, 60)
-	elseif hueName == "green" then return math.random(80, 160)
-	elseif hueName == "cyan" then return math.random(170, 200)
-	elseif hueName == "blue" then return math.random(210, 250)
+	elseif hueName == "orange" then return math.random(30,  50)
+	elseif hueName == "yellow" then return math.random(55,  60)
+	elseif hueName == "green"  then return math.random(80,  160)
+	elseif hueName == "cyan"   then return math.random(170, 200)
+	elseif hueName == "blue"   then return math.random(210, 250)
 	elseif hueName == "violet" then return math.random(260, 270)
 	elseif hueName == "purple" then return math.random(280, 290)
-	elseif hueName == "pink" then return math.random(300, 330)
+	elseif hueName == "pink"   then return math.random(300, 330)
 	end
 end
 
