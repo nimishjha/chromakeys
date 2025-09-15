@@ -63,6 +63,7 @@ You'll need to bind the following commands to keyboard shortcuts of your choice.
 "Shift-F10":		"command:ckSaturationDecLarge",
 "Shift-F11":		"command:ckLightnessDecLarge",
 
+"Shift-F8":			"command:ckRandomizeCustomPalette",
 "Alt-F8":			"command:ckNextSaturationOption",
 
 "Shift-F12":		"command:ckToggleDebugMode",
@@ -116,7 +117,7 @@ To get an idea of what ChromaKeys can do, press `F8` a few times. Then press `Sh
 
 Press `Alt-1` to switch to the `RandomPalette` mode. Press `F8` a few times.
 
-Use `Alt-1` and `Alt-2` to cycle through the available color scheme generation modes.
+Use `Alt-1` and `Alt-2` to cycle through the available color scheme generation modes (functions).
 
 The modes should be self-explanatory:
 
@@ -165,9 +166,9 @@ If you prefer to set the custom palette hues manually, or if you want more than 
 
 ## Concepts
 
-When generating entire color schemes, you select a palette (or a palette generator function) and press `F8` until you get a color scheme you like.
+When generating entire color schemes, you select a palette, or a palette generator function using `Alt-1` and `Alt-2` and press `F8` until you get a color scheme you like.
 
-When creating color schemes manually, you choose a scope (a highlight group), and adjust its color. There are four special scopes:
+When creating color schemes manually, you choose a scope (a highlight group) using `Alt-leftarrow` and `Alt-rightarrow`, and adjust its color. There are four special scopes:
 
 - `base`: This sets the base color. If you're creating a color scheme manually (as opposed to using the palettes), this is the first scope you need to set.
 - `all`: This applies the command to all scopes. Useful if you want to adjust the hue/saturation/lightness of the entire scheme.
@@ -201,11 +202,13 @@ Use `ckNextColorScheme` (Alt-l) and `ckPreviousColorScheme` (Alt-k). There is al
 
 ## A-B comparisons
 
-`ckABSetA` (Alt-Shift-Y) and `ckABSetB` (Alt-Shift-U) will set the current color scheme in A-B comparison slots A and B respectively. `ckABSelectA` (Alt-y) and `ckABSelectB` (Alt-u) will let you apply the color scheme in each slot for easy comparison.
+`ckABSetA` (Alt-Shift-Y) and `ckABSetB` (Alt-Shift-U) will set the current color scheme in A-B comparison slots A and B respectively. `ckABSelectA` (Alt-y) and `ckABSelectB` (Alt-u) will let you apply the color scheme in either slot for easy comparison.
 
 ## Editing existing color schemes
 
-ChromaKeys can only work with files in your user-specific micro colorschemes folder (`~/.config/micro/colorschemes`). So if you want to edit an existing color scheme, copy the file to that folder, and in Micro, select it using the `ckNextColorScheme` or `ckPreviousColorScheme` commands. If you use `set colorscheme <schemename>`, ChromaKeys will not parse the scheme. You can use the `set ...` command and then quickly use the prev/next scheme shortcuts (Alt-k, Alt-l) so that the scheme is parsed. Once you're happy with the modified scheme, use `ckSaveCurrentTheme` (F1). This will save it using the filename format mentioned above - the existing theme file will not be touched.
+ChromaKeys can only work with files in your user-specific micro colorschemes folder (`~/.config/micro/colorschemes`). So if you want to edit an existing color scheme, copy the file to that folder, and in Micro, select it using the `ckNextColorScheme` or `ckPreviousColorScheme` commands. If you use `set colorscheme <schemename>`, ChromaKeys will not parse the scheme. You can use the `set ...` command and then quickly use the prev/next scheme shortcuts (Alt-k, Alt-l) so that the scheme is parsed. Alternatively, you can use the `ckCreateRulesFromScheme` command.
+
+Once you're happy with the modified scheme, use `ckSaveCurrentTheme` (F1). This will save it using the filename format mentioned above - the existing theme file will not be touched.
 
 ## AAQ (Anticipated asked questions)
 
