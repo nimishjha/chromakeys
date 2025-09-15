@@ -64,16 +64,16 @@ local settings = {
 		CustomPalette         = { 75, 140 },
 		BlueCyan              = { 220, 190 },
 		BlueCyanOrange        = { 240, 210, 190, 180, 30, 40 },
-		BlueGreen             = { 210, 220, 230, 240, 130, 140 },
+		BlueGreen             = { 210, 120 },
 		BlueOrange            = { 220, 40 },
-		BlueRed               = { 220, 230, 240, 350, 0 },
-		BlueRedOrange         = { 230, 240, 250, 350, 0, 40 },
-		BlueYellow            = { 220, 240, 60 },
+		BlueRed               = { 220, 0 },
+		BlueRedOrange         = { 230, 0, 40 },
+		BlueYellow            = { 220, 60, 240 },
 		CyanBlueOrange        = { 180, 190, 220, 230, 240, 40 },
 		CyanGreen             = { 190, 80 },
 		CyanOrange            = { 180, 190, 40 },
 		CyanYellow            = { 190, 60 },
-		GreenCyan             = { 110, 130, 150, 170, 180, 190 },
+		GreenCyan             = { 110, 190, 130, 150 },
 		GreenYellow           = { 120, 130, 140, 160, 45, 55 },
 		MonochromeBlue        = { 210, 240 },
 		MonochromeCyan        = { 170, 180, 190 },
@@ -117,7 +117,7 @@ local saturationOptions = {
 	medium    = { min = 40, max = 60 },
 	vivid     = { min = 60, max = 80 },
 	wild      = { min = 80, max = 100 },
-	random    = { min = 40,  max = 100 },
+	random    = { min = 40, max = 100 },
 }
 
 local colorFunctions = {}
@@ -307,6 +307,30 @@ function setMaxChannelValue(bp, args)
 	end
 end
 
+function setMinSaturation(bp, args)
+	if args ~= nil and #args > 0 then
+		local value = tonumber(args[1])
+		if type(value) == "number" and value > 0 and value < 100 then
+			settings.paletteMinSaturation = value
+			if settings.paletteMaxSaturation < settings.paletteMinSaturation then
+				settings.paletteMaxSaturation = value
+			end
+		end
+	end
+end
+
+function setMaxSaturation(bp, args)
+	if args ~= nil and #args > 0 then
+		local value = tonumber(args[1])
+		if type(value) == "number" and value > 0 and value < 100 then
+			settings.paletteMaxSaturation = value
+			if settings.paletteMinSaturation > settings.paletteMaxSaturation then
+				settings.paletteMinSaturation = value
+			end
+		end
+	end
+end
+
 function getMatchingStrings(array, str)
 	local matches = {}
 	for _, stringFromArray in ipairs(array) do
@@ -379,30 +403,6 @@ function toggleBooleanOption(optionName)
 	return function()
 		settings[optionName] = not settings[optionName]
 		showMessage(string.format("%s: %s", optionName, settings[optionName]))
-	end
-end
-
-function setMinSaturation(bp, args)
-	if args ~= nil and #args > 0 then
-		local value = tonumber(args[1])
-		if type(value) == "number" and value > 0 and value < 100 then
-			settings.paletteMinSaturation = value
-			if settings.paletteMaxSaturation < settings.paletteMinSaturation then
-				settings.paletteMaxSaturation = value
-			end
-		end
-	end
-end
-
-function setMaxSaturation(bp, args)
-	if args ~= nil and #args > 0 then
-		local value = tonumber(args[1])
-		if type(value) == "number" and value > 0 and value < 100 then
-			settings.paletteMaxSaturation = value
-			if settings.paletteMinSaturation > settings.paletteMaxSaturation then
-				settings.paletteMinSaturation = value
-			end
-		end
 	end
 end
 
@@ -581,7 +581,7 @@ function shuffleExcludingFirstItem(array)
 	local n = #array
 	local firstItem = array[1]
 	for i = n, 2, -1 do
-		local j = math.random(1, i)
+		local j = math.random(2, i)
 		array[i], array[j] = array[j], array[i]
 	end
 	array[1] = firstItem
@@ -628,9 +628,7 @@ function setTemplateVariables()
 	settings.fgVars = fgVars
 	settings.bgVars = bgVars
 	settings.calcVars = calcVars
-	settings.fgVarsExceptFgDefault = exclude(fgVars, {
-		"fgDefault"
-	})
+	settings.fgVarsExceptFgDefault = exclude(fgVars, { "fgDefault" })
 end
 
 
@@ -830,13 +828,6 @@ function colorsAreTooClose(a, b)
 	local h1, s1, l1 = splitHsl(a)
 	local h2, s2, l2 = splitHsl(b)
 	return math.abs(h1 - h2) < 10 and math.abs(s1 - s2) < 10 and math.abs(l1 - l2) < 10
-end
-
-function isNotTooGarish(r, g, b)
-	if r > 127 and g < 127 then
-		return false
-	end
-	return true
 end
 
 function hslToRgb(hslValue)
@@ -1648,21 +1639,42 @@ function getVarianceBasedOnNumberOfHues(numHues)
 	return variance
 end
 
+function getLightnessValues(count)
+	local lightnesses = {}
+	local lightness = settings.minFgLightness
+	local lightnessStep = (settings.maxFgLightness - settings.minFgLightness) / count
+	for _ = 1, count do
+		table.insert(lightnesses, lightness)
+		lightness = lightness + lightnessStep
+	end
+	return lightnesses
+end
+
 function generateColorsFromHues(hues, numColors)
 	assert(type(hues) == "table" and #hues > 0 and type(numColors) == "number" and numColors > 0, "invalid arguments")
+	if #hues == 1 then
+		table.insert(hues, hues[1])
+	end
 
-	local colorsPerHue = math.ceil(numColors / #hues)
+	local colorsPerHue = math.ceil((numColors - 1) / (#hues - 1))
 	local colors = {}
 
 	local hVariance = 10
 	local hFinal, sFinal, lFinal
 
-	for _, hue in ipairs(hues) do
-		for _ = 1, colorsPerHue do
+	hFinal = addHue(hues[1], math.random(0, hVariance))
+	sFinal = math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation)
+	lFinal = math.random(settings.minFgLightness, settings.maxFgLightness)
+	table.insert(colors, makeHsl(hFinal, sFinal, lFinal))
+
+	local lightnesses = getLightnessValues(colorsPerHue)
+
+	for index = 2, #hues do
+		local hue = hues[index]
+		for j = 1, colorsPerHue do
 			hFinal = addHue(hue, math.random(0, hVariance))
 			sFinal = math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation)
-			lFinal = math.random(settings.minFgLightness, settings.maxFgLightness)
-			table.insert(colors, makeHsl(hFinal, sFinal, lFinal))
+			table.insert(colors, makeHsl(hFinal, sFinal, lightnesses[j]))
 			if #colors == numColors then break end
 		end
 		if #colors == numColors then break end
@@ -1747,12 +1759,9 @@ end
 
 function generateColorsBySteppedLightness(numColors)
 	local colors = {}
-	local lightnessRange = 65 - settings.minFgLightness
-	local step = lightnessRange / numColors
-	local lightness = settings.minFgLightness
-	for _ = 1, numColors do
-		table.insert(colors, makeHsl(settings.base.h, math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation), lightness))
-		lightness = lightness + step
+	local lightnessValues = getLightnessValues(numColors)
+	for index = 1, numColors do
+		table.insert(colors, makeHsl(settings.base.h, math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation), lightnessValues[index]))
 	end
 	shuffle(colors)
 	return colors
@@ -1840,7 +1849,7 @@ function initSaturationCycler()
 	for optionName, _ in pairs(saturationOptions) do
 		settings.saturationOptions:add(optionName)
 	end
-	settings.saturationOptions:select("medium")
+	settings.saturationOptions:select("random")
 	local range = saturationOptions[settings.saturationOptions:current()]
 	settings.paletteMinSaturation = range.min
 	settings.paletteMaxSaturation = range.max
@@ -1858,7 +1867,6 @@ end
 function generateColorScheme()
 	assert(#settings.fgVars > 1, "fgVars are not set")
 	settings.shouldRecalculateDerivedColors = true
-	forceLog(settings.colorFunctionNames:current())
 	local colorGenFunc = colorFunctions[settings.colorFunctionNames:current()]
 	if type(colorGenFunc) ~= "function" then
 		showMessage(string.format("colorGenFunc: expected function, received %s", type(colorGenFunc)))
@@ -1877,7 +1885,7 @@ function generateColorScheme()
 		applyColorScheme()
 		settings.generationCount = settings.generationCount + 1
 	else
-		forceLog(string.format("Expected %s colors, received %s", #settings.fgVars, #settings.fgColors))
+		showMessage(string.format("Expected %s colors, received %s", #settings.fgVars, #settings.fgColors))
 	end
 end
 
