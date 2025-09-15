@@ -61,49 +61,30 @@ local settings = {
 	hueCycleStep = 10,
 	CUSTOM_PALETTE_NAME = "CustomPalette",
 	palettes = {
-		CustomPalette         = { 75, 140 },
-		BlueCyan              = { 220, 190 },
-		BlueCyanOrange        = { 240, 210, 190, 180, 30, 40 },
-		BlueGreen             = { 210, 120 },
-		BlueOrange            = { 220, 40 },
-		BlueRed               = { 220, 0 },
-		BlueRedOrange         = { 230, 0, 40 },
-		BlueYellow            = { 220, 60, 240 },
-		CyanBlueOrange        = { 180, 190, 220, 230, 240, 40 },
-		CyanGreen             = { 190, 80 },
-		CyanOrange            = { 180, 190, 40 },
-		CyanYellow            = { 190, 60 },
-		GreenCyan             = { 110, 190, 130, 150 },
-		GreenYellow           = { 120, 130, 140, 160, 45, 55 },
-		MonochromeBlue        = { 210, 240 },
-		MonochromeCyan        = { 170, 180, 190 },
-		MonochromeCyan2       = { 160, 170 },
-		MonochromeGreen2      = { 75, 155 },
-		MonochromeGreen       = { 80, 90, 110, 120, 130, 140, 150, 160 },
-		MonochromeOrange      = { 20, 30 },
-		MonochromePink        = { 315, 320, 325, 330, 335 },
-		MonochromeRed         = { 350, 0, 10 },
-		MonochromeViolet      = { 250, 255, 260, 265, 270, 280 },
-		MonochromeYellow      = { 55, 65 },
-		MoreBlueLessOrange    = { 210, 220, 230, 240, 30, 40 },
-		OrangeBlue            = { 25, 240 },
-		OrangeCyan2           = { 40, 180 },
-		OrangeCyan            = { 25, 190 },
-		OrangeCyan3           = { 50, 190 },
-		OrangeCyan4           = { 20, 190 },
-		OrangeCyan5           = { 20, 175 },
-		OrangeViolet          = { 25, 250 },
-		RedBlue               = { 350, 0, 220, 230, 240 },
-		RedPink               = { 0, 330 },
-		VioletBlue            = { 250, 260, 220 },
-		VioletCyan            = { 250, 190 },
-		VioletCyanRedOrange   = { 250, 190, 0, 20 },
-		VioletGreen           = { 250, 260, 160 },
-		VioletGreenCyan       = { 250, 90, 190 },
-		VioletOrange          = { 250, 260, 30 },
-		VioletPink            = { 250, 260, 330 },
-		VioletRed             = { 250, 260, 0 },
-		VioletYellow          = { 250, 260, 60 },
+		CustomPalette = { 75, 140 },
+	},
+	palettesWithNamedHues = {
+		BlueGreen     = { "blue", "green" },
+		BlueGreen2    = { "blue", "green", "green" },
+		BlueOrange    = { "blue", "orange" },
+		BlueRed       = { "blue", "red" },
+		BlueYellow    = { "blue", "yellow" },
+		CyanOrange    = { "cyan", "orange" },
+		CyanYellow    = { "cyan", "yellow" },
+		GreenCyan     = { "green", "cyan" },
+		GreenYellow   = { "green", "yellow" },
+		OrangeBlue    = { "orange", "blue" },
+		OrangeCyan    = { "orange", "cyan" },
+		OrangeViolet  = { "orange", "violet" },
+		RedBlue       = { "red", "blue" },
+		RedPink       = { "red", "pink" },
+		VioletBlue    = { "violet", "blue" },
+		VioletCyan    = { "violet", "cyan" },
+		VioletGreen   = { "violet", "green" },
+		VioletOrange  = { "violet", "orange" },
+		VioletRed     = { "violet", "red" },
+		VioletPink    = { "violet", "pink" },
+		VioletYellow  = { "violet", "yellow" },
 	},
 	isDebugMode = false,
 	showStatusOnLoad = false,
@@ -1685,7 +1666,40 @@ function generateColorsFromHues(hues, numColors)
 	return colors
 end
 
+function getNumericHueFromHueName(hueName)
+	if hueName == "red" then
+		if math.random() > 0.5 then
+			return math.random(0, 20)
+		else
+			return math.random(340, 359)
+		end
+	elseif hueName == "orange" then return math.random(30, 50)
+	elseif hueName == "yellow" then return math.random(55, 60)
+	elseif hueName == "green" then return math.random(80, 160)
+	elseif hueName == "cyan" then return math.random(170, 200)
+	elseif hueName == "blue" then return math.random(210, 250)
+	elseif hueName == "violet" then return math.random(260, 270)
+	elseif hueName == "purple" then return math.random(280, 290)
+	elseif hueName == "pink" then return math.random(300, 330)
+	end
+end
+
+function generateColorsFromPaletteName(paletteName, numColors)
+	local palette = settings.palettesWithNamedHues[paletteName]
+	local numericHues = {}
+	for _, hueName in ipairs(palette) do
+		table.insert(numericHues, getNumericHueFromHueName(hueName))
+	end
+	return generateColorsFromHues(numericHues, numColors)
+end
+
 function createPaletteFunction(paletteName)
+	return function(numColors)
+		return generateColorsFromPaletteName(paletteName, numColors)
+	end
+end
+
+function createNumericPaletteFunction(paletteName)
 	return function(numColors)
 		local hues = settings.palettes[paletteName]
 		return generateColorsFromHues(hues, numColors)
@@ -1808,6 +1822,9 @@ end
 
 function initColorFuncCycler()
 	for paletteName, paletteHues in pairs(settings.palettes) do
+		colorFunctions[paletteName] = createNumericPaletteFunction(paletteName)
+	end
+	for paletteName, paletteHues in pairs(settings.palettesWithNamedHues) do
 		colorFunctions[paletteName] = createPaletteFunction(paletteName)
 	end
 
