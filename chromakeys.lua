@@ -91,6 +91,7 @@ local settings = {
 		VioletRed       = { "violet", "red"    },
 		VioletYellow    = { "violet", "yellow" },
 	},
+	currentHues = {},
 	isDebugMode = false,
 	showStatusOnLoad = false,
 	generationCount = 0,
@@ -345,6 +346,10 @@ function logTable(tableInstance, indentLevel)
 	end
 end
 
+function forceLogArray(tbl)
+	forceLog(table.concat(tbl, " "))
+end
+
 function selectColorFunction(bp, args)
 	if args[1] ~= nil then
 		local colorFunctionNames = settings.colorFunctionNames:getVariables()
@@ -493,10 +498,8 @@ end
 
 function showStatus()
 	local colorFunctionName = settings.colorFunctionNames:current()
-	if colorFunctionName == settings.CUSTOM_PALETTE_NAME or colorFunctionName == "RandomPalette" then
-		colorFunctionName = colorFunctionName .. " " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], " ")
-	end
-	local statusInfo = padToWidth(colorFunctionName, 24) .. " " .. padToWidth(settings.saturationOptions:current(), 10) .. " ◼ " .. currentScopeInfoToString()
+	local hues = table.concat(settings.currentHues, " ")
+	local statusInfo = padToWidth(colorFunctionName .. " " .. hues, 80) .. padToWidth(settings.saturationOptions:current(), 10) .. " ◼ " .. currentScopeInfoToString()
 	showMessage(statusInfo .. " ◼ " .. settings.logString)
 	settings.logString = ""
 end
@@ -1632,6 +1635,8 @@ function generateColorsFromHues(hues, numColors)
 		table.insert(hues, hues[1])
 	end
 
+	settings.currentHues = hues
+
 	local colorsPerHue = math.ceil((numColors - 1) / (#hues - 1))
 	local colors = {}
 
@@ -1759,6 +1764,7 @@ function generateColorsByRandomHueForEveryColor(numColors)
 end
 
 function generateColorsByRandomLightness(numColors)
+	settings.currentHues = { settings.base.h }
 	local colors = {}
 	for _ = 1, numColors do
 		table.insert(colors, makeHsl(settings.base.h, math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation), math.random(settings.minFgLightness, 60)))
@@ -1767,6 +1773,7 @@ function generateColorsByRandomLightness(numColors)
 end
 
 function generateColorsBySteppedLightness(numColors)
+	settings.currentHues = { settings.base.h }
 	local colors = {}
 	local lightnessValues = getLightnessValues(numColors)
 	for index = 1, numColors do
