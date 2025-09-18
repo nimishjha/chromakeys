@@ -65,6 +65,7 @@ local settings = {
 	},
 	palettesWithNamedHues = {
 		BlueGreen       = { "blue",   "green"  },
+		BlueCyan        = { "blue",   "cyan"  },
 		BlueGreenCyan   = { "blue",   "green", "cyan"  },
 		BlueOrange      = { "blue",   "orange" },
 		BlueRed         = { "blue",   "red"    },
@@ -1866,12 +1867,16 @@ function initSaturationCycler()
 	settings.paletteMaxSaturation = range.max
 end
 
-function nextSaturationOption()
-	settings.saturationOptions:next()
+function applySaturationSettings()
 	local range = saturationOptions[settings.saturationOptions:current()]
 	settings.paletteMinSaturation = range.min
 	settings.paletteMaxSaturation = range.max
 	settings.backgroundSaturation = math.random(range.min, range.max)
+end
+
+function nextSaturationOption()
+	settings.saturationOptions:next()
+	applySaturationSettings()
 	generateColorScheme()
 end
 
@@ -1977,6 +1982,7 @@ function init()
 	createColorSchemeText()
 	createScratchFilesIfRequired()
 	randomizeCustomPalette()
+	applySaturationSettings()
 
 	if settings.showStatusOnLoad then
 		showStatus()
