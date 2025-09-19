@@ -1284,29 +1284,12 @@ end
 function adjustPerceptualBrightness(hsl)
 	local hueKey = math.floor(hsl.h / 10) * 10
 	local adjustmentLookup = {
-		[50]  = -2,
-		[60]  = -4,
-		[70]  = -4,
-		[80]  = -5,
-		[90]  = -5,
-		[100] = -5,
-		[110] = -5,
-		[120] = -5,
-		[130] = -5,
-		[140] = -5,
-		[150] = -5,
-		[160] = -7,
-		[170] = -7,
-		[180] = -7,
-		[190] = -5,
-		[200] = -5,
-		[210] = -3,
 		[220] = 5,
-		[230] = 5,
-		[240] = 5,
-		[250] = 5,
-		[260] = 5,
-		[270] = 5,
+		[230] = 7,
+		[240] = 7,
+		[250] = 7,
+		[260] = 7,
+		[270] = 7,
 		[280] = 5,
 	}
 	local adjustment = adjustmentLookup[hueKey]
@@ -1393,12 +1376,6 @@ function createRules()
 	if settings.shouldLockFgDefaultToBaseColor then
 		setScopeColor("fgDefault", settings.base)
 	end
-
-	if settings.shouldAdjustPerceptualBrightness then
-		for _, varName in ipairs(settings.fgVars) do
-			settings.rulesMap[varName] = adjustPerceptualBrightness(settings.rulesMap[varName])
-		end
-	end
 end
 
 function createDemoRules()
@@ -1411,7 +1388,11 @@ function createDemoRules()
 		settings.rulesMap[varName] = bgColor
 	end
 	for _, varName in ipairs(settings.calcVars) do
-		settings.rulesMap[varName] = fgColor
+		if string.match(varName, "Bg") then
+			settings.rulesMap[varName] = bgColor
+		else
+			settings.rulesMap[varName] = fgColor
+		end
 	end
 	for _, varName in ipairs(SPECIAL_SCOPES) do
 		settings.rulesMap[varName] = fgColor
@@ -1581,6 +1562,15 @@ function applyConstraints()
 
 	if settings.shouldLimitChannelValues then
 		limitChannelBrightnessForAllRules()
+	end
+
+	if settings.shouldAdjustPerceptualBrightness then
+		for _, varName in ipairs(settings.fgVars) do
+			local hue = settings.rulesMap[varName].h
+			if hue > 210 and hue < 260 then
+				settings.rulesMap[varName].l = clamp(settings.rulesMap[varName].l, math.min(settings.maxFgLightness, 60), math.min(settings.maxFgLightness + 10, 100))
+			end
+		end
 	end
 
 	logRules()
@@ -2070,6 +2060,7 @@ function init()
 	config.MakeCommand("ckSettingsSetMaxChannelValue",      setMaxChannelValue,                                         config.NoComplete)
 
 	config.MakeCommand("ckToggleForceWhite",                toggleBooleanOption("shouldForceOneColorToWhite"),          config.NoComplete)
+	config.MakeCommand("ckTogglePerceptualBrightness",      toggleBooleanOption("shouldAdjustPerceptualBrightness"),    config.NoComplete)
 	config.MakeCommand("ckToggleDebugMode",                 toggleDebugMode,                                            config.NoComplete)
 	config.MakeCommand("ckToggleConstraints",               toggleConstraints,                                          config.NoComplete)
 
