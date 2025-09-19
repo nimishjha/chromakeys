@@ -29,7 +29,7 @@ You'll need to bind the following commands to keyboard shortcuts of your choice.
 "Alt-7":			"command:ckRandomiseSaturation",
 "Alt-8":			"command:ckRandomiseLightness",
 
-"Alt-B":			"command:ckSettingsToggleUseBaseSL",
+"Alt-B":			"command:ckToggleForceWhite",
 "Alt-h":			"command:ckNextGroup",
 
 "Alt-j":			"command:ckFirstColorScheme",
@@ -72,20 +72,31 @@ You'll need to bind the following commands to keyboard shortcuts of your choice.
 
 Additional commands are available that you can also bind to keyboard shortcuts:
 
-### `ckCustomPaletteSetHues`
+### `ckSetNumericHues`
 
 Set the hues for the custom palette.
 
 Examples:
 ```
-ckCustomPaletteSetHues 35 190
-ckCustomPaletteSetHues 35 190 240 250 280 0 330
+ckSetNumericHues 35 190
+ckSetNumericHues 35 190 240 250 280 0 330
 ```
 
 To bind this to a keyboard shortcut, say `Ctrl-b`, put this in `bindings.json`:
 ```
-"Ctrl-b":			"command-edit:ckCustomPaletteSetHues ",
+"Ctrl-b":			"command-edit:ckSetNumericHues ",
 ```
+
+### `ckSetNamedHues`
+
+Set the hues for the custom palette using named hues.
+
+Examples:
+```
+ckSetNamedHues blue cyan
+ckSetNamedHues red purple pink violet cyan
+```
+
 
 ### `ckSettingsSetMaxChannelValue`
 
@@ -108,6 +119,10 @@ ckSelectColorFunction shades
 ckSelectColorFunction shadesofb
 ckSelectColorFunction cyclic
 ```
+
+### `ckToggleForceWhite`
+
+Ensure that one color in the generated color scheme is white (or light gray, depending on your configured `maxFgLightness`).
 
 ### Basic Usage
 
@@ -162,7 +177,7 @@ The plugin comes with a range of pre-selected palettes. Or if you prefer to make
 
 To select a saturation range for the generated colors, use `ckNextSaturationOption` (Alt-F8). Or use the `ckSetMinSaturation` and `ckSetMaxSaturation` commands.
 
-If you prefer to set the custom palette hues manually, or if you want more than two base hues, you can use the command `ckCustomPaletteSetHues <hue1> <hue2> ... <hueN>`.
+If you prefer to set the custom palette hues manually, or if you want more than two base hues, you can use the command `ckSetNumericHues <hue1> <hue2> ... <hueN>` or `ckSetNamedHues <namedHue1> <namedHue2> ... <namedHueN>`.
 
 ## Concepts
 
