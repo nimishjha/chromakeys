@@ -1941,11 +1941,23 @@ function customPaletteSetNumericHues(bp, args)
 end
 
 function customPaletteSetNamedHues(bp, args)
+	local validNamedHues = {
+		red = true,
+		orange = true,
+		yellow = true,
+		green = true,
+		cyan = true,
+		blue = true,
+		violet = true,
+		purple = true,
+		pink = true,
+	}
+
 	if args ~= nil and #args > 0 then
 		local hues = {}
 		for i = 1, #args do
 			local hue = args[i]
-			if type(hue) == "string" then
+			if type(hue) == "string" and validNamedHues[hue] then
 				table.insert(hues, hue)
 			end
 		end
