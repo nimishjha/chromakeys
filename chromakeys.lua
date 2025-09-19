@@ -15,7 +15,6 @@ local settings = {
 	bgVars = {},
 	calcVars = {},
 	fgColors = {},
-	useBaseSL = false,
 	base = {
 		h = 220,
 		s = 50,
@@ -1899,7 +1898,7 @@ function generateColorScheme()
 
 	if #settings.fgColors == #settings.fgVars then
 		if settings.shouldForceOneColorToWhite then
-			local index = math.random(1, #settings.fgColors)
+			local index = math.random(1, math.floor(#settings.fgColors / 2))
 			settings.fgColors[index] = makeHsl(0, 0, settings.maxFgLightness)
 		end
 		createRules()
@@ -2020,8 +2019,6 @@ function init()
 	config.MakeCommand("ckResetBaseSaturationAndLightness", resetBaseSaturationAndLightness,                            config.NoComplete)
 	config.MakeCommand("ckSaveCurrentTheme",                saveCurrentThemeToNumberedFile,                             config.NoComplete)
 	config.MakeCommand("ckCreateRulesFromScheme",           createRulesFromScheme,                                      config.NoComplete)
-	config.MakeCommand("ckToggleDebugMode",                 toggleDebugMode,                                            config.NoComplete)
-	config.MakeCommand("ckToggleConstraints",               toggleConstraints,                                          config.NoComplete)
 	config.MakeCommand("ckForceLogRules",                   forceLogRules,                                              config.NoComplete)
 	config.MakeCommand("ckFirstColorScheme",                firstColorScheme,                                           config.NoComplete)
 	config.MakeCommand("ckNextGroup",                       nextGroup,                                                  config.NoComplete)
@@ -2037,7 +2034,11 @@ function init()
 	config.MakeCommand("ckCustomPaletteSetHues",            customPaletteSetHues,                                       config.NoComplete)
 
 	config.MakeCommand("ckSettingsSetMaxChannelValue",      setMaxChannelValue,                                         config.NoComplete)
-	config.MakeCommand("ckSettingsToggleUseBaseSL",         toggleBooleanOption("useBaseSL"),                           config.NoComplete)
+
+	config.MakeCommand("ckToggleForceWhite",                toggleBooleanOption("shouldForceOneColorToWhite"),          config.NoComplete)
+	config.MakeCommand("ckToggleDebugMode",                 toggleDebugMode,                                            config.NoComplete)
+	config.MakeCommand("ckToggleConstraints",               toggleConstraints,                                          config.NoComplete)
+
 	config.MakeCommand("ckSetMinSaturation",                setMinSaturation,                                           config.NoComplete)
 	config.MakeCommand("ckSetMaxSaturation",                setMaxSaturation,                                           config.NoComplete)
 	config.MakeCommand("ckNextSaturationOption",            nextSaturationOption,                                       config.NoComplete)
