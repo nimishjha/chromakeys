@@ -59,10 +59,12 @@ local settings = {
 	lightnessStep = 0.5,
 	hueCycleStep = 10,
 	CUSTOM_PALETTE_NAME = "CustomPalette",
+	CUSTOM_NAMED_HUES_PALETTE_NAME = "CustomNamedHues",
 	palettes = {
 		CustomPalette = { 75, 140 },
 	},
 	palettesWithNamedHues = {
+		CustomNamedHues = { "blue",   "violet" },
 		BlueGreen       = { "blue",   "green"  },
 		BlueCyan        = { "blue",   "cyan"  },
 		BlueGreenCyan   = { "blue",   "green", "cyan"  },
@@ -1919,7 +1921,7 @@ function showCustomPalette()
 	showMessage("Custom palette is now { " .. table.concat(settings.palettes[settings.CUSTOM_PALETTE_NAME], ", ") .. " }")
 end
 
-function customPaletteSetHues(bp, args)
+function customPaletteSetNumericHues(bp, args)
 	if args ~= nil and #args > 0 then
 		local hues = {}
 		for i = 1, #args do
@@ -1931,6 +1933,25 @@ function customPaletteSetHues(bp, args)
 		if #hues > 0 then
 			settings.palettes[settings.CUSTOM_PALETTE_NAME] = hues
 			settings.colorFunctionNames:select(settings.CUSTOM_PALETTE_NAME)
+			generateColorScheme()
+		else
+			showMessage("No valid hues were provided")
+		end
+	end
+end
+
+function customPaletteSetNamedHues(bp, args)
+	if args ~= nil and #args > 0 then
+		local hues = {}
+		for i = 1, #args do
+			local hue = args[i]
+			if type(hue) == "string" then
+				table.insert(hues, hue)
+			end
+		end
+		if #hues > 0 then
+			settings.palettesWithNamedHues[settings.CUSTOM_NAMED_HUES_PALETTE_NAME] = hues
+			settings.colorFunctionNames:select(settings.CUSTOM_NAMED_HUES_PALETTE_NAME)
 			generateColorScheme()
 		else
 			showMessage("No valid hues were provided")
@@ -2031,7 +2052,8 @@ function init()
 	config.MakeCommand("ckABSelectA",                       selectColorSchemeA,                                         config.NoComplete)
 	config.MakeCommand("ckABSelectB",                       selectColorSchemeB,                                         config.NoComplete)
 
-	config.MakeCommand("ckCustomPaletteSetHues",            customPaletteSetHues,                                       config.NoComplete)
+	config.MakeCommand("ckSetNumericHues",                  customPaletteSetNumericHues,                                config.NoComplete)
+	config.MakeCommand("ckSetNamedHues",                    customPaletteSetNamedHues,                                  config.NoComplete)
 
 	config.MakeCommand("ckSettingsSetMaxChannelValue",      setMaxChannelValue,                                         config.NoComplete)
 
