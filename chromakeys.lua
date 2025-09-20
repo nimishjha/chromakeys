@@ -64,33 +64,34 @@ local settings = {
 		CustomPalette = { 75, 140 },
 	},
 	palettesWithNamedHues = {
-		CustomNamedHues = { "blue",   "violet" },
-		BlueGreen       = { "blue",   "green"  },
-		BlueCyan        = { "blue",   "cyan"  },
-		BlueGreenCyan   = { "blue",   "green", "cyan"  },
-		BlueOrange      = { "blue",   "orange" },
-		BlueRed         = { "blue",   "red"    },
-		BlueYellow      = { "blue",   "yellow" },
-		CyanGreen       = { "cyan",   "green"  },
-		CyanOrange      = { "cyan",   "orange" },
-		CyanYellow      = { "cyan",   "yellow" },
-		GreenCyan       = { "green",  "cyan"   },
-		OrangeBlue      = { "orange", "blue"   },
-		OrangeCyan      = { "orange", "cyan"   },
-		OrangeViolet    = { "orange", "violet" },
-		PurpleOrange    = { "purple", "orange" },
-		PurplePink      = { "purple", "pink"   },
-		RedBlue         = { "red",    "blue"   },
-		RedCyan         = { "red",    "cyan"   },
-		RedPink         = { "red",    "pink"   },
-		VioletBlue      = { "violet", "blue"   },
-		VioletCyan      = { "violet", "cyan"   },
-		VioletGreenCyan = { "violet", "green", "cyan"  },
-		VioletGreen     = { "violet", "green"  },
-		VioletOrange    = { "violet", "orange" },
-		VioletPink      = { "violet", "pink"   },
-		VioletRed       = { "violet", "red"    },
-		VioletYellow    = { "violet", "yellow" },
+		CustomNamedHues     = { "violet", "purple" },
+		BlueGreen           = { "blue",   "green"  },
+		BlueCyan            = { "blue",   "cyan"  },
+		BlueGreenCyan       = { "blue",   "green", "cyan"  },
+		BlueOrange          = { "blue",   "orange" },
+		BlueRed             = { "blue",   "red"    },
+		BlueYellow          = { "blue",   "yellow" },
+		CyanGreen           = { "cyan",   "green"  },
+		CyanOrange          = { "cyan",   "orange" },
+		CyanYellow          = { "cyan",   "yellow" },
+		GreenCyan           = { "green",  "cyan"   },
+		OrangeBlue          = { "orange", "blue"   },
+		OrangeCyan          = { "orange", "cyan"   },
+		OrangeViolet        = { "orange", "violet" },
+		PurpleOrange        = { "purple", "orange" },
+		PurplePink          = { "purple", "pink"   },
+		RedBlue             = { "red",    "blue"   },
+		RedCyan             = { "red",    "cyan"   },
+		RedPink             = { "red",    "pink"   },
+		VioletBlue          = { "violet", "blue"   },
+		VioletCyan          = { "violet", "cyan"   },
+		VioletGreenCyan     = { "violet", "green", "cyan"  },
+		VioletGreen         = { "violet", "green"  },
+		VioletOrange        = { "violet", "orange" },
+		VioletPink          = { "violet", "pink"   },
+		VioletPurplePink    = { "violet", "purple", "pink" },
+		VioletRed           = { "violet", "red"    },
+		VioletYellow        = { "violet", "yellow" },
 	},
 	currentHues = {},
 	isDebugMode = false,
@@ -1560,10 +1561,6 @@ function applyConstraints()
 		ensureSeparationFromDefault("fgStatement", "fgConstant", "fgConstantString")
 	end
 
-	if settings.shouldLimitChannelValues then
-		limitChannelBrightnessForAllRules()
-	end
-
 	if settings.shouldAdjustPerceptualBrightness then
 		for _, varName in ipairs(settings.fgVars) do
 			local hue = settings.rulesMap[varName].h
@@ -1571,6 +1568,10 @@ function applyConstraints()
 				settings.rulesMap[varName].l = clamp(settings.rulesMap[varName].l, math.min(settings.maxFgLightness, 60), math.min(settings.maxFgLightness + 10, 100))
 			end
 		end
+	end
+
+	if settings.shouldLimitChannelValues then
+		limitChannelBrightnessForAllRules()
 	end
 
 	logRules()
