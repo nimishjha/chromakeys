@@ -842,9 +842,9 @@ function hslToRgb(hslValue)
 	local g = hueToRgb(h)
 	local b = hueToRgb(h - 1/3)
 
-	r = math.floor(r * 255 + 0.5)
-	g = math.floor(g * 255 + 0.5)
-	b = math.floor(b * 255 + 0.5)
+	r = round(r * 255)
+	g = round(g * 255)
+	b = round(b * 255)
 
 	return r, g, b
 end
@@ -925,9 +925,9 @@ function hslToHex(hslValue)
 	local g = hueToRgb(h)
 	local b = hueToRgb(h - 1/3)
 
-	r = math.floor(r * 255 + 0.5)
-	g = math.floor(g * 255 + 0.5)
-	b = math.floor(b * 255 + 0.5)
+	r = round(r * 255)
+	g = round(g * 255)
+	b = round(b * 255)
 
 	return string.format("%02x%02x%02x", r, g, b)
 end
@@ -1504,11 +1504,8 @@ end
 
 function checkRulesValidity()
 	for _, scope in ipairs(settings.fgVars) do
-		if settings.rulesMap[scope] == nil then
-			forceLog(scope .. " is nil")
-			return false
-		elseif not isValidHsl(settings.rulesMap[scope]) then
-			forceLog(string.format("checkRulesValidity: settings.rulesMap[%s] is not an HSL value", scope))
+		if not isValidHsl(settings.rulesMap[scope]) then
+			forceLog(string.format("checkRulesValidity: settings.rulesMap[%s] is not an HSL value: %s", scope, debugInvalidHsl(hslValue)))
 			return false
 		end
 	end
@@ -1589,25 +1586,6 @@ end
 
 function createColorSchemeText()
 	settings.colorSchemeText = replaceVariables(colorSchemeTemplate, settings.rulesMap)
-end
-
-function getVarianceBasedOnNumberOfHues(numHues)
-	local varianceLookup = {
-		[1] = 60,
-		[2] = 50,
-		[3] = 40,
-		[4] = 30,
-		[5] = 20,
-		[6] = 10,
-		[7] = 10,
-		[8] = 10,
-		[9] = 10,
-		[10] = 10,
-	}
-
-	local variance = varianceLookup[numHues]
-	if variance == nil then variance = 30 end
-	return variance
 end
 
 function getLightnessValues(count)
