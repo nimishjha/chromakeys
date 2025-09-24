@@ -66,7 +66,7 @@ local settings = {
 	palettesWithNamedHues = {
 		CustomNamedHues     = { "violet", "purple" },
 		BlueGreen           = { "blue",   "green"  },
-		BlueCyan            = { "blue",   "cyan"  },
+		BlueCyan            = { "blue",   "cyan"   },
 		BlueGreenCyan       = { "blue",   "green", "cyan"  },
 		BlueOrange          = { "blue",   "orange" },
 		BlueRed             = { "blue",   "red"    },
@@ -103,9 +103,9 @@ local saturationOptions = {
 	grayscale = { min = 0, max = 0 },
 	pale      = { min = 10, max = 20 },
 	mild      = { min = 20, max = 40 },
-	medium    = { min = 40, max = 60 },
-	vivid     = { min = 60, max = 80 },
-	wild      = { min = 80, max = 100 },
+	medium    = { min = 40, max = 50 },
+	vivid     = { min = 50, max = 75 },
+	wild      = { min = 75, max = 100 },
 	random    = { min = 40, max = 100 },
 }
 
@@ -339,7 +339,7 @@ function logTable(tableInstance, indentLevel)
 		local indentString = string.rep("\t", indentLevel) .. key .. " = "
 	  	if type(value) == "table" then
 			forceLog(indentString .. "(table)")
-			logTable(value, indentLevel+1)
+			logTable(value, indentLevel + 1)
 	  	elseif type(value) == nil then
 			forceLog(indentString .. " nil")
 		else
@@ -560,12 +560,10 @@ end
 
 function shuffleExcludingFirstItem(array)
 	local n = #array
-	local firstItem = array[1]
 	for i = n, 2, -1 do
 		local j = math.random(2, i)
 		array[i], array[j] = array[j], array[i]
 	end
-	array[1] = firstItem
 	return array
 end
 
@@ -1001,9 +999,9 @@ function getBaseColorName(hsl)
 	local hue = hsl.h
 	if hsl.s < 15 then return "Gray"
 	elseif (hue >= 0 and hue < 10) or (hue >= 320 and hue <= 359) then return "Red"
-	elseif hue >= 10  and hue < 50  then return "Orange"
-	elseif hue >= 50  and hue < 80  then return "Yellow"
-	elseif hue >= 80  and hue < 170 then return "Green"
+	elseif hue >= 10  and hue < 55  then return "Orange"
+	elseif hue >= 55  and hue < 70  then return "Yellow"
+	elseif hue >= 70  and hue < 170 then return "Green"
 	elseif hue >= 170 and hue < 200 then return "Cyan"
 	elseif hue >= 200 and hue < 250 then return "Blue"
 	elseif hue >= 250 and hue < 270 then return "Violet"
