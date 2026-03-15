@@ -51,7 +51,7 @@ local settings = {
 	currentColorScheme = "zzChromaKeys1",
 	colorSchemePrefix = "ck",
 	colorSchemeA = "ckGray01",
-	colorSchemeB = "ckOrange01",
+	colorSchemeB = "ckGreen06",
 	logString = "",
 	colorSchemeText = "",
 	hueStep = 1,
@@ -1977,6 +1977,10 @@ function createScratchFilesIfRequired()
 		config.Reload()
 	end
 end
+
+
+
+
 
 function init()
 	math.randomseed(time.Now():Unix())
