@@ -678,7 +678,8 @@ end
 
 function selectColorScheme(colorScheme)
 	if colorScheme ~= nil then
-		config.SetGlobalOption("colorscheme", colorScheme)
+		micro.CurPane():HandleCommand("set colorscheme " .. colorScheme)
+		-- config.SetGlobalOption("colorscheme", colorScheme, true)
 		createRulesFromScheme()
 		showMessage(string.format("Color scheme set to %s max channel value is %s", padToWidth(colorScheme, 20), settings.originalRulesMaxChannelValue))
 	else
@@ -1085,7 +1086,8 @@ function applyColorScheme()
 	else
 		log("Saved " .. settings.currentColorScheme .. ".micro")
 		showStatus()
-		config.SetGlobalOption("colorscheme", settings.currentColorScheme)
+		-- config.SetGlobalOption("colorscheme", settings.currentColorScheme, true)
+		micro.CurPane():HandleCommand("set colorscheme " .. settings.currentColorScheme)
 	end
 end
 
