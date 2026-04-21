@@ -28,9 +28,9 @@ local settings = {
 	scopes = {},
 	colorFunctionNames = {},
 	uniformBrightness = 60,
-	minFgLightness = 35,
+	minFgLightness = 30,
 	maxFgLightness = 70,
-	maxBgLightness = 15,
+	maxBgLightness = 20,
 	backgroundLightness = 6,
 	backgroundSaturation = 100,
 	commentBgLightness = 15,
@@ -44,7 +44,7 @@ local settings = {
 	shouldRecalculateDerivedColors = true,
 	shouldAdjustPerceptualBrightness = false,
 	shouldForceOneColorToWhite = false,
-	maxChannelValue = 200,
+	maxChannelValue = 170,
 	rulesMap = {},
 	currentScope = "fgDefault",
 	colorSchemeFolderPath = "",
@@ -106,7 +106,7 @@ local saturationOptions = {
 	medium    = { min = 40, max = 50 },
 	vivid     = { min = 50, max = 75 },
 	wild      = { min = 75, max = 100 },
-	random    = { min = 40, max = 100 },
+	random    = { min = 20, max = 100 },
 }
 
 local colorFunctions = {}
@@ -277,9 +277,9 @@ color-link trailingws "{{bgDefault}}"
 color-link underlined "{{fgStatement}}"
 color-link ignore "#CC00CC"
 
-color-link selection "#AABBCC,#000080"
+color-link selection "{{fgSelection}},{{bgSelection}}"
 color-link indent-char "#202020"
-color-link match-brace "#EEEE00"
+color-link match-brace "#cccc00"
 ]]
 
 
@@ -1169,6 +1169,9 @@ function adjustHsl(hslValue, action, scope)
 		h = math.random(0, 359)
 		s = math.random(10, 90)
 		l = isBackgroundScope(scope) and settings.backgroundLightness or math.random(settings.minFgLightness, settings.maxFgLightness)
+		if scope == "bgSelection" then
+			l = 30
+		end
 	elseif action == ACTIONS.RANDOMISE_HUE then
 		h = math.random(0, 359)
 	elseif action == ACTIONS.RANDOMISE_SATURATION then
@@ -1227,6 +1230,7 @@ function adjustCurrentScopeColor(action)
 			end
 		end
 		settings.rulesMap.bgDefault = forceLightness(settings.rulesMap.bgDefault, settings.backgroundLightness)
+		settings.rulesMap.bgSelection = forceLightness(settings.rulesMap.fgDefault, 30)
 		settings.allExceptFgDefaultAsOne = adjustedHsl
 	else
 		setScopeColor(currentScope, adjustHsl(settings.rulesMap[currentScope], action, currentScope))
@@ -1425,7 +1429,8 @@ function createRulesFromScheme()
 		statusline        = "StatusLine",
 		message           = "Message",
 		linenumber        = "LineNumber",
-		currentlinenumber = "CurrentLineNumber"
+		currentlinenumber = "CurrentLineNumber",
+		selection         = "fgSelection"
 	}
 
 	local colorTable = {}
@@ -1466,6 +1471,10 @@ function createRulesFromScheme()
 		if sanitizedKey == "fgDefault" then
 			settings.rulesMap.fgDefault = hexToHslWithFallback(colors.fg)
 			settings.rulesMap.bgDefault = hexToHslWithFallback(colors.bg)
+			setBackgroundColor(settings.rulesMap.bgDefault)
+		elseif sanitizedKey == "fgSelection" then
+			settings.rulesMap.fgSelection = hexToHslWithFallback(colors.fg)
+			settings.rulesMap.bgSelection = hexToHslWithFallback(colors.bg)
 			setBackgroundColor(settings.rulesMap.bgDefault)
 		elseif sanitizedKey == "fgComment" then
 			settings.rulesMap.fgComment = hexToHslWithFallback(colors.fg)
@@ -1537,12 +1546,14 @@ function applyConstraints()
 		settings.rulesMap.fgSymbol                = deriveFgSymbol(fg)
 		settings.rulesMap.fgComment               = clampLightness(settings.rulesMap.fgComment, 50, 75)
 		settings.rulesMap.calcBgComment           = forceLightness(settings.rulesMap.fgComment, 15)
-		settings.rulesMap.calcFgStatusLine        = clampSaturation(forceLightness(fg, 35), 0, 35)
+		settings.rulesMap.calcFgStatusLine        = clampSaturation(forceLightness(fg, 25), 0, 35)
 		settings.rulesMap.calcBgStatusLine        = clampSaturation(forceLightness(fg, 4), 0, 35)
 		settings.rulesMap.calcBgStatusLine.l      = math.min(settings.rulesMap.calcBgStatusLine.l, bg.l)
-		settings.rulesMap.calcFgLineNumber        = clampSaturation(forceLightness(fg, 25), 0, 40)
-		settings.rulesMap.calcFgCurrentLineNumber = clampSaturation(forceLightness(fg, 65), 0, 40)
+		settings.rulesMap.calcFgLineNumber        = clampSaturation(forceLightness(fg, 20), 0, 40)
+		settings.rulesMap.calcFgCurrentLineNumber = clampSaturation(forceLightness(fg, 50), 0, 40)
 		settings.rulesMap.calcFgMessage           = clampSaturation(forceLightness(fg, 35), 0, 35)
+		settings.rulesMap.fgSelection             = forceLightness(fg, 35)
+		settings.rulesMap.bgSelection             = forceLightness(fg, 35)
 
 		settings.rulesMap.fgConstantString.h = settings.rulesMap.fgConstant.h
 		settings.rulesMap.fgConstantString.l = settings.rulesMap.fgConstant.l
@@ -1582,6 +1593,7 @@ function limitChannelBrightnessForAllRules()
 			settings.rulesMap[scope] = limitChannelBrightness(settings.rulesMap[scope], scope)
 		end
 	end
+	-- settings.rulesMap.bgSelection = clampLightness(settings.rulesMap.bgSelection, 15, 30)
 end
 
 function createColorSchemeText()
@@ -1911,15 +1923,15 @@ end
 
 function customPaletteSetNamedHues(bp, args)
 	local validNamedHues = {
-		red = true,
+		red    = true,
 		orange = true,
 		yellow = true,
-		green = true,
-		cyan = true,
-		blue = true,
+		green  = true,
+		cyan   = true,
+		blue   = true,
 		violet = true,
 		purple = true,
-		pink = true,
+		pink   = true,
 	}
 
 	if args ~= nil and #args > 0 then
@@ -2040,7 +2052,7 @@ function init()
 	config.MakeCommand("ckSetNumericHues",                  customPaletteSetNumericHues,                                config.NoComplete)
 	config.MakeCommand("ckSetNamedHues",                    customPaletteSetNamedHues,                                  config.NoComplete)
 
-	config.MakeCommand("ckSettingsSetMaxChannelValue",      setMaxChannelValue,                                         config.NoComplete)
+	config.MakeCommand("ckSetMaxChannelValue",              setMaxChannelValue,                                         config.NoComplete)
 
 	config.MakeCommand("ckToggleForceWhite",                toggleBooleanOption("shouldForceOneColorToWhite"),          config.NoComplete)
 	config.MakeCommand("ckTogglePerceptualBrightness",      toggleBooleanOption("shouldAdjustPerceptualBrightness"),    config.NoComplete)
