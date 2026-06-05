@@ -28,7 +28,7 @@ local settings = {
 	scopes = {},
 	colorFunctionNames = {},
 	uniformBrightness = 60,
-	minFgLightness = 30,
+	minFgLightness = 25,
 	maxFgLightness = 70,
 	maxBgLightness = 20,
 	backgroundLightness = 6,
@@ -38,20 +38,20 @@ local settings = {
 	paletteMaxSaturation = 0,
 	saturationOptions = {},
 	shouldForceUniformBrightness = false,
-	shouldEnsureSeparation = true,
+	shouldEnsureSeparation = false,
 	shouldLimitChannelValues = true,
 	shouldLockFgDefaultToBaseColor = false,
 	shouldRecalculateDerivedColors = true,
 	shouldAdjustPerceptualBrightness = false,
 	shouldForceOneColorToWhite = false,
-	maxChannelValue = 170,
+	maxChannelValue = 255,
 	rulesMap = {},
 	currentScope = "fgDefault",
 	colorSchemeFolderPath = "",
 	currentColorScheme = "zzChromaKeys1",
 	colorSchemePrefix = "ck",
 	colorSchemeA = "ckGray01",
-	colorSchemeB = "ckGreen06",
+	colorSchemeB = "aaRed10",
 	logString = "",
 	colorSchemeText = "",
 	hueStep = 1,
@@ -106,6 +106,7 @@ local saturationOptions = {
 	medium    = { min = 40, max = 50 },
 	vivid     = { min = 50, max = 75 },
 	wild      = { min = 75, max = 100 },
+	max       = { min = 100, max = 100 },
 	random    = { min = 20, max = 100 },
 }
 
@@ -1541,6 +1542,7 @@ function applyConstraints()
 
 	local fg = settings.rulesMap.fgDefault
 	local bg = settings.rulesMap.bgDefault
+	local selectionHue = (fg.h + math.random(-30, 30)) % 360
 
 	if settings.shouldRecalculateDerivedColors then
 		settings.rulesMap.fgSymbol                = deriveFgSymbol(fg)
@@ -1548,12 +1550,13 @@ function applyConstraints()
 		settings.rulesMap.calcBgComment           = forceLightness(settings.rulesMap.fgComment, 15)
 		settings.rulesMap.calcFgStatusLine        = clampSaturation(forceLightness(fg, 25), 0, 35)
 		settings.rulesMap.calcBgStatusLine        = clampSaturation(forceLightness(fg, 4), 0, 35)
-		settings.rulesMap.calcBgStatusLine.l      = math.min(settings.rulesMap.calcBgStatusLine.l, bg.l)
+		-- settings.rulesMap.calcBgStatusLine.l      = math.min(settings.rulesMap.calcBgStatusLine.l, bg.l)
+		settings.rulesMap.calcBgStatusLine.l      = 0
 		settings.rulesMap.calcFgLineNumber        = clampSaturation(forceLightness(fg, 20), 0, 40)
 		settings.rulesMap.calcFgCurrentLineNumber = clampSaturation(forceLightness(fg, 50), 0, 40)
 		settings.rulesMap.calcFgMessage           = clampSaturation(forceLightness(fg, 35), 0, 35)
-		settings.rulesMap.fgSelection             = forceLightness(fg, 35)
-		settings.rulesMap.bgSelection             = forceLightness(fg, 35)
+		settings.rulesMap.fgSelection             = makeHsl(selectionHue, math.random(70, 100), 45)
+		settings.rulesMap.bgSelection             = makeHsl(selectionHue, math.random(70, 100), 15)
 
 		settings.rulesMap.fgConstantString.h = settings.rulesMap.fgConstant.h
 		settings.rulesMap.fgConstantString.l = settings.rulesMap.fgConstant.l
