@@ -611,6 +611,18 @@ function setTemplateVariables()
 	settings.fgVarsExceptFgDefault = exclude(fgVars, { "fgDefault" })
 end
 
+function generateRandomValuesBetween(min, max, count)
+	local step = max / count
+	local arr = {}
+
+	for i = 1, count do
+		table.insert(arr, i * step)
+	end
+
+	shuffle(arr)
+	return arr
+end
+
 
 
 
@@ -1751,20 +1763,25 @@ end
 function generateColorsByRandomLightness(numColors)
 	settings.currentHues = { settings.base.h }
 	local colors = {}
-	for _ = 1, numColors do
-		table.insert(colors, makeHsl(settings.base.h, math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation), math.random(settings.minFgLightness, 60)))
+	local lightnessValues = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+
+	for i = 1, numColors do
+		local saturation = math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation);
+		table.insert(colors, makeHsl(settings.base.h, saturation, lightnessValues[i]))
 	end
+
 	return colors
 end
 
 function generateColorsBySteppedLightness(numColors)
 	settings.currentHues = { settings.base.h }
 	local colors = {}
-	local lightnessValues = getLightnessValues(numColors)
+	local lightnessValues = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+
 	for index = 1, numColors do
 		table.insert(colors, makeHsl(settings.base.h, math.random(settings.paletteMinSaturation, settings.paletteMaxSaturation), lightnessValues[index]))
 	end
-	shuffle(colors)
+
 	return colors
 end
 
@@ -1780,6 +1797,50 @@ function generateColorsByShadesOfCyclicHue(numColors)
 	return generateColorsFromHues({ math.floor(settings.generationCount * 2 % 360) }, numColors)
 end
 
+function generateColorsByRedGreen(numColors)
+	local colors = {}
+	local reds = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+	local greens = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+
+	for i = 1, numColors do
+		table.insert(colors, hexToHsl(rgbToHex(reds[i], greens[i], 0)))
+	end
+
+	return colors
+end
+
+function generateColorsOrange(numColors)
+	local colors = {}
+	local reds = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+	local greens = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+
+	for i = 1, numColors do
+		table.insert(colors, hexToHsl(rgbToHex(reds[i], math.min(greens[i], reds[i] * 0.75), 0)))
+	end
+	return colors
+end
+
+function generateColorsByRedBlue(numColors)
+	local colors = {}
+	local reds = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+	local blues = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+
+	for i = 1, numColors do
+		table.insert(colors, hexToHsl(rgbToHex(reds[i], 0, blues[i] * 0.5)))
+	end
+	return colors
+end
+
+function generateColorsByBlueGreen(numColors)
+	local colors = {}
+	local greens = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+	local blues = generateRandomValuesBetween(0, settings.maxChannelValue, numColors)
+
+	for i = 1, numColors do
+		table.insert(colors, hexToHsl(rgbToHex(0, greens[i], blues[i])))
+	end
+	return colors
+end
 
 
 
@@ -1826,6 +1887,10 @@ function initColorFuncCycler()
 	colorFunctions.SemiRandomFixedBaseHS  = generateColorsBySemiRandomFixedBaseHS
 	colorFunctions.SemiRandomFixedBaseH   = generateColorsBySemiRandomFixedBaseH
 	colorFunctions.SemiRandomPalette      = generateColorsBySemiRandomPalette
+	colorFunctions.limitedToBlueGreen     = generateColorsByBlueGreen
+	colorFunctions.limitedToRedBlue       = generateColorsByRedBlue
+	colorFunctions.limitedToRedGreen      = generateColorsByRedGreen
+	colorFunctions.limitedToOrange        = generateColorsOrange
 	colorFunctions.RandomPalette          = generateColorsByRandomPalette
 
 	settings.colorFunctionNames = Cyclable.new({})
